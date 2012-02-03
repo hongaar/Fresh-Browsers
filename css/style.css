@@ -1,0 +1,29 @@
+.browsers {
+	text-align:center;
+}
+.browser {
+	background: url("/img/browsers.png") no-repeat top center;
+	width:52px;
+	height:52px;
+	margin:0 auto;
+}
+.browser a {
+	width:52px;
+	height:52px;
+	display:block;
+}
+#browser_Firefox {
+	background-position:-106px 0;
+}
+#browser_Safari {
+	background-position:-51px 0;
+}
+#browser_Chrome {
+	background-position:0 0;
+}
+#browser_Opera {
+	background-position:-226px 0;
+}
+#browser_IE {
+	background-position:-166px 0;
+}
