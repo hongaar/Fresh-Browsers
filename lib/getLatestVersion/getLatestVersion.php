@@ -10,6 +10,9 @@
  *
  * Date: 2012-02-06
  *
+ * TODO:
+ * предусмотреть возможность сохранения нескольких стабильных и нестабильных версий (м.б. какие-то теги)
+ *
  */
  
  
@@ -19,6 +22,7 @@ class PDOWrapper {
 	public $versionsFile = 'versions.json';
 	public $updatePeriod = 86400;
 	public $toBeUpdated = array();
+	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
 
 	public function __construct() {
 		
@@ -34,7 +38,7 @@ class PDOWrapper {
 		
 		$this->wikiLinks = include($this->dir.'/'.$this->links);
 		
-		$this->versions = $this->getVersions();
+		 = $this->setVersions();
 	
 		$this->updateVersions();
 		
@@ -66,7 +70,7 @@ class PDOWrapper {
 	
 	// получить список браузеров из конфига
 	// если на вход передан массив, то добавляем версию и дату последнего обновления
-	public function getBrowsers($browsersValues = array()) {
+	public function getVersions($browsersValues = array()) {
 		$browsersOut = array();
 		foreach ($this->wikiLinks as $browser=>$branch) {
 			if (!isset($browsersOut[$browser])) {
@@ -93,12 +97,12 @@ class PDOWrapper {
 	}
 	
 	
-	public function getVersions() {
+	public function setVersions() {
 		$versions = NULL;
 		if (file_exists($this->versionsFile)) {
 			$versions = json_decode(file_get_contents($this->versionsFile));
 		}
-		return $this->getBrowsers($versions);
+		$this->versions = $this->getVersions($versions);
 	}
 	
 	
@@ -116,8 +120,8 @@ class PDOWrapper {
 			$release = $this->getVersionFromWiki($this->wikiLinks[$browser['name'][$browser['branch']]);
 			
 			$this->versions[$browser['name']][$browser['branch']] = array(
-													'releaseVersion'=>	$release['version'],
-													'releaseDate'	=>	$release['date'],
+													'releaseVersion'=>	$release[0]['version'],
+													'releaseDate'	=>	$release[0]['date'],
 													'lastUpdate'	=>	time(),
 													);
 													
@@ -128,6 +132,32 @@ class PDOWrapper {
 	
 	public function getVersionFromWiki($link) {
 		$file_get_contents
+		$ch = curl_init();
+		$options = array(
+			CURLOPT_URL				=>	$link,
+			CURLOPT_RETURNTRANSFER	=>	true,
+			CURLOPT_FOLLOWLOCATION	=>	true,
+			CURLOPT_MAXREDIRS		=>	10,
+			CURLOPT_HEADER			=>	false, 
+			CURLOPT_TIMEOUT			=>	4, 
+			CURLOPT_USERAGENT		=>	$this->userAgent
+		);
+		curl_setopt_array($ch, $options);
+		$text = curl_exec($ch);
+		curl_close($ch);
+		
+		preg_match_all('/{{(.*)}}/sU', $text, $matches);
+		if (isset($matches[1]) && !empty($matches[1])) {
+			$versions = array();
+			foreach ($matches[1] as $match) {
+				preg_match_all('/^|latest_release_version = (.*)/i', $match, $ver);
+				if (!isset($ver[1][1])) return false;
+				$versions[] = $ver[1][1];
+			}
+			return $versions;
+		}
+		return false;
+		
 	}
 
 	 
