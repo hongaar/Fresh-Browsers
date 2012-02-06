@@ -2,7 +2,7 @@
 
 /*
  * nanobanano framework 
- * http://
+ * https://github.com/Groozly/nanobanano
  *
  * Copyright (c) 2011 by Dmitry Elfimov
  * Released under the MIT License.
