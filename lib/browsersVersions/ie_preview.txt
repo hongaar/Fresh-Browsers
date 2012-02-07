@@ -1,0 +1,12 @@
+{{LPR|
+ article = Internet Explorer
+|latest_release_version = 10.0.8102.0 Platform Preview 3
+|latest_release_date = {{release date and age|2011|09|13}}
+}}<noinclude>
+
+➔ Back to article "'''[[Internet Explorer]]'''"
+
+[[Category:Latest preview software release templates|Internet Explorer]]
+
+[[ko:틀:소프트웨어의 최신 버전 (미리보기판)/인터넷 익스플로러]]
+</noinclude>

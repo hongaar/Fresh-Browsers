@@ -1,0 +1,14 @@
+{{LPR
+|article = Safari
+|latest_release_version = 5.1.2
+|latest_release_date = {{Start date and age|2011/2/3}}
+}}<ref>{{Citation|url=http://9to5mac.com/2011/2/03/safari-5-2-1-beta-seeded-to-developers-includes-pdf-viewing-bug-fixes/|title=Safari 5.1.2 beta seeded to developers, includes PDF viewing bug fixes|work=Apple Intelligence|publisher=9to5Mac.com|date=November 3, 2011 at 5:15 pm}}</ref><noinclude>
+
+➔ Back to article "'''[[Safari (web browser)]]'''"
+
+{{Template reference list}}
+
+[[Category:Latest preview software release templates|Safari]]
+
+[[ko:틀:소프트웨어의 최신 버전 (미리보기판)/사파리 (웹 브라우저)]]
+</noinclude>

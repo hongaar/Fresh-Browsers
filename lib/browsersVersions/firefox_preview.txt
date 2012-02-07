@@ -1,0 +1,21 @@
+{{LPR
+| article = Firefox
+|latest_release_version = 11.0 Beta 1
+|latest_release_date = {{Start date and age|2012|2|03}}
+}}<ref>{{Citation|url=https://www.mozilla.org/en-US/firefox/11.0beta/releasenotes/|title=Mozilla Firefox Beta Release Notes|date=February 3, 2012}}</ref>
+<noinclude>
+➔ Back to article "'''[[Firefox]]'''"
+
+*When updating this template please update the reference's link to the version's [[release notes]].
+*[https://nightly.mozilla.org/ Nightly] and Aurora builds are not considered releases and edits which refer them will be reverted without notice.''
+*'''Do not update the template if the new version is only listed in the FTP servers, wait for the Mozilla website to be updated at [https://www.mozilla.org/en-US/firefox/channel/], [https://www.mozilla.org/en-US/firefox/all-beta.html] or [http://www.mozilla.org/en-US/firefox/beta/].'''
+
+{{Template reference list}}
+
+[[Category:Latest preview software release templates|Mozilla Firefox]]
+
+[[ja:Template:Latest preview software release/Mozilla Firefox]]
+[[ko:틀:소프트웨어의 최신 버전 (미리보기판)/모질라 파이어폭스]]
+[[pl:Szablon:Ostatnie testowe wydanie/Mozilla Firefox]]
+[[zh:Template:Latest preview software release/Mozilla Firefox]]
+</noinclude>

@@ -1,0 +1,12 @@
+{{LPR|
+ article = Opera
+|latest_release_version = 12.00 alpha (Build 1272) <!--http://my.opera.com/desktopteam/blog/2012/02/01/ook!-->
+|latest_release_date = {{Release date and age|2012|02|1}}
+}}<noinclude>
+
+➔ Back to article "'''[[Opera (web browser)]]'''"
+
+[[Category:Latest preview software release templates|Opera]]
+
+[[ko:틀:소프트웨어의 최신 버전 (미리보기판)/오페라 (웹 브라우저)]]
+</noinclude>

@@ -1,0 +1,12 @@
+{{LSR|
+ article = Internet Explorer
+|latest_release_version = 9.0.2
+|latest_release_date = {{release date and age|2011|08|11}}
+}}<noinclude>
+
+➔ Back to article "'''[[Internet Explorer]]'''"
+
+[[Category:Latest stable software release templates|Internet Explorer]]
+
+[[ko:틀:소프트웨어의 최신 버전 (안정판)/인터넷 익스플로러]]
+</noinclude>

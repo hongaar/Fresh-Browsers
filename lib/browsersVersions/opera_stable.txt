@@ -1,0 +1,14 @@
+{{LSR
+| article = Opera
+| latest_release_version = 11.61
+| latest_release_date = {{Release date and age|2012|01|24}}
+}}<noinclude>
+
+➔ Back to article "'''[[Opera (web browser)]]'''"
+
+{{Template reference list}}
+
+[[Category:Latest stable software release templates|Opera]]
+
+[[ko:틀:소프트웨어의 최신 버전 (안정판)/오페라 (웹 브라우저)]]
+</noinclude>

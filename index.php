@@ -8,7 +8,7 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2011-12-16
+ * Date: 2012-02-07
  */
 
 
@@ -20,6 +20,16 @@ if (isset($_GET['c']) && !empty($_GET['c'])) {
 
 $__dir = dirname(__FILE__);
 $__tpl = $__dir.'/tpl/'.$__tpl.'.php';
+
+
+include($__dir.'/lib/lib.php');
+$lib = new lib(array(
+				't'			=>	array('translate'),
+				'browsers'	=>	array('browsersVersions'),
+				'pdo'		=>	array('PDO', 'sqlite:'.$__dir.'/versions/browsers.sqlite'),
+				'db'		=>	array('PDOWrapper', '@pdo'),
+			));
+			
 
 if (!file_exists($__tpl)) {
 	header("HTTP/1.0 404 Not Found");

@@ -1,0 +1,19 @@
+{{LSR
+| article = Firefox
+| latest release version = 10.0
+| latest release date = {{Start date and age|2012|01|31}}
+}}<ref>{{Citation|url=https://www.mozilla.org/en-US/firefox/10.0/releasenotes/|title=Mozilla Firefox Release Notes|date=January 31, 2012}}</ref>
+<noinclude>
+
+→ Back to article "'''[[Firefox]]'''"
+
+''Please do not update this template to the next version until the release notes [https://www.mozilla.org/en-US/firefox/9.0.1/releasenotes/] for that version are available.''
+
+{{Template reference list}}
+
+[[Category:Latest stable software release templates|Mozilla Firefox]]
+
+[[ja:Template:Latest stable software release/Mozilla Firefox]]
+[[ko:틀:소프트웨어의 최신 버전 (안정판)/모질라 파이어폭스]]
+[[pl:Szablon:Ostatnie stabilne wydanie/Mozilla Firefox]]
+[[zh:Template:Latest stable software release/Mozilla Firefox]]</noinclude>
