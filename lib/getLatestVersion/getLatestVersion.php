@@ -131,7 +131,7 @@ class PDOWrapper {
 	}
 	
 	public function getVersionFromWiki($link) {
-		$file_get_contents
+		$wiki = file_get_contents($link);
 		$ch = curl_init();
 		$options = array(
 			CURLOPT_URL				=>	$link,
