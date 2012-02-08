@@ -5,7 +5,7 @@ $browsers = $lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 2
 					->execute()
 					->fetchAll();
 
-$versions = $lib->browsers->getVersions();
+$versions = $lib->browsersVersions->getVersions();
 
 $update = $lib->db->prepare('UPDATE browsers SET stableVersion=:stableVersion, stableUpdate=:stableUpdate, previewVersion=:previewVersion, previewUpdate=:previewUpdate WHERE id=:id');
 foreach ($browsers as $browser) {

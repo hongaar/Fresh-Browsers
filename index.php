@@ -25,7 +25,7 @@ $__tpl = $__dir.'/tpl/'.$__tpl.'.php';
 include($__dir.'/lib/lib.php');
 $lib = new lib(array(
 				't'			=>	array('translate'),
-				'browsers'	=>	array('browsersVersions'),
+//				'browsers'	=>	array('browsersVersions'),
 				'pdo'		=>	array('PDO', 'sqlite:'.$__dir.'/versions/browsers.sqlite'),
 				'db'		=>	array('PDOWrapper', '@pdo'),
 			));
