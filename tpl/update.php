@@ -1,13 +1,13 @@
 <?php
 
 
-$browsers = $lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
+$browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
 					->execute()
 					->fetchAll();
 
-$versions = $lib->browsersVersions->getVersions();
+$versions = $this->lib->browsersVersions->getVersions();
 
-$update = $lib->db->prepare('UPDATE browsers SET stableVersion=:stableVersion, stableUpdate=:stableUpdate, previewVersion=:previewVersion, previewUpdate=:previewUpdate WHERE id=:id');
+$update = $this->lib->db->prepare('UPDATE browsers SET stableVersion=:stableVersion, stableUpdate=:stableUpdate, previewVersion=:previewVersion, previewUpdate=:previewUpdate WHERE id=:id');
 foreach ($browsers as $browser) {
 	$name = strtolower($browser['shortName']);
 	if (isset($versions[$name]['stable']) && $versions[$name]['stable']['releaseVersion']>$browser['stableVersion']) {

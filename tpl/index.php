@@ -17,7 +17,7 @@
 	}
 */
 
-	$browsers = $lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
+	$browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
 						->execute()
 						->fetchAll();
 						

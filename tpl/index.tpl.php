@@ -27,7 +27,7 @@
 
 	<div class="container">
 	
-	<?php require($__tpl); ?>
+	<?=$this->out?>
 
 	<hr>
 	

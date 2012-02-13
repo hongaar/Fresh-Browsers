@@ -1,9 +1,9 @@
 <?php
 
 
-$browsersArr = $lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
-					->execute()
-					->fetchAll();
+$browsersArr = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
+						->execute()
+						->fetchAll();
 					
 $browsers = array();
 $browsersValues = array(-1=>'---');
@@ -11,7 +11,7 @@ $browsersValues = array(-1=>'---');
 foreach ($browsersArr as $browser) {
 	$shortName = strtolower($browser['shortName']);
 	$browsers[$shortName] = $browser;
-	$browsersValues[$shortName] = $browser['name'];
+	$browsersValues[$browser['id']] = $browser['name'];
 }
 
 $branches = array(
@@ -30,7 +30,8 @@ $values = array(
 	'date'		=>	'',
 	'note'		=>	'',
 );
-$time = 0;
+$releaseTime = 0;
+
 if (isset($_POST)) {
 	foreach ($values as $id=>&$value) {
 		if (isset($_POST[$id])) {
@@ -45,9 +46,9 @@ if (isset($_POST)) {
 					break;
 				
 				case $id=='date':
-					$time = strtotime($newValue);
-					if ($time>0) {
-						$value = date('Y-m-d', $time);
+					$releaseTime = strtotime($newValue);
+					if ($releaseTime>0) {
+						$value = date('Y-m-d', $releaseTime);
 					}					
 					break;
 					
@@ -56,7 +57,36 @@ if (isset($_POST)) {
 			}
 		}
 	}
+	
+	
+	if ($values['browser']!=-1 && $values['branch']!=-1) {
+		$result = $lib->db->prepare('INSERT INTO history (browserId, branch, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branch, :releaseVersion, :releaseDate, :modified)')
+				->bind(':browserId', $values['browser'])
+				->bind(':branch', $values['branch'])
+				->bind(':releaseVersion', $values['version'])
+				->bind(':releaseDate', $releaseTime)
+				->bind(':modified', time())
+				->execute();
+				
+		if ($result!==false) {
+			echo '<br><br><div class="alert alert-success">'
+				.$browsersValues[$values['browser']]
+				.' '
+				.$branches[$values['branch']]
+				.' ver. '
+				.$values['version']
+				.' @ '
+				.$values['date']
+				.'</div>';
+		}
+	} 
+	
+	// print_r($browsers[$values['browser']]['id']);
+	// print_r($values);
+	
 }
+
+
 
 ?>
 <br>
