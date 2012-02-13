@@ -1,5 +1,8 @@
 <?php
 
+$this->edit = false;
+
+
 $branches = array(
 	-1	=>	'---',
 	1	=>	'Stable',
@@ -15,6 +18,8 @@ $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName L
 foreach ($browsers as $browser) {
 	$browsers[$browser['id']][] = $browser;
 }*/
+
+
 		
 		
 $historyArr = $this->lib->db->prepare('SELECT * FROM history ORDER BY browserId, releaseDate DESC LIMIT 1000')
@@ -44,7 +49,7 @@ foreach ($browsers as $browser) {
 		if (isset($history[$browser['id']][1])) {
 			foreach ($history[$browser['id']][1] as $historyObj) {
 			?>
-				<li><?=$historyObj['releaseVersion']?> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span></li>
+				<li><?=$historyObj['releaseVersion']?> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span><?=$this->edit?' <a href="/edit/'.$historyObj['id'].'" class="icon-edit"></a> <a href="/remove/'.$historyObj['id'].'" class="icon-remove"></a>':''?></li>
 			<?php
 			}
 		}

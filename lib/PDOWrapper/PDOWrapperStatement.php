@@ -16,6 +16,8 @@ class PDOWrapperStatement {
 
 	private $handler;
 	private $statement;
+	public $error = false;
+	
 	
 	public function __construct($handler) {
 		$this->handler = $handler;
@@ -51,10 +53,17 @@ class PDOWrapperStatement {
 	
 
     public function execute(array $parameters=null) {
-		$this->statement->execute();
+		$this->error = !$this->statement->execute();
         return $this;
     }
 	
+	public function errorCode() {
+		return $this->statement->errorCode();
+	}
+	
+	public function errorInfo() {
+		return $this->statement->errorInfo();
+	}
 	
     public function fetch($fetchStyle=PDO::FETCH_ASSOC) {
         return $this->statement->fetch($fetchStyle);
