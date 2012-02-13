@@ -13,12 +13,16 @@
 class core {
 	
 	public $dir = '';
+	public $indexPHP = 'index.php';
 	public $action = 'index';
 	public $mainTemplate = 'index.tpl';
+	public $subDir = '';
 	public $variables = array();
 	public $template = '';
 	public $lib = null;
 	public $libs = array();
+	
+	public $requestURI = null;
 	
 	
 	public function __construct() {
@@ -27,12 +31,21 @@ class core {
 	
 	public function render() {
 		$this->controller();
+//		print_r($_SERVER);
+//		print_r($this->action);
+//		print_r($this->variables);
 		$this->model();
 		return $this->view();
 	}
 	
 	public function controller() {
-		$request = ltrim($_SERVER['REQUEST_URI'], "/\/\\ \t\n\r\0\x0B");
+		if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && ($_SERVER['DOCUMENT_ROOT'].'/'.$this->indexPHP!=$_SERVER['SCRIPT_FILENAME'])) {
+			$serverScriptFilenameLength = strlen($_SERVER['SCRIPT_FILENAME']);
+			$serverDocumentRootLength = strlen($_SERVER['DOCUMENT_ROOT']);
+			$this->subDir = substr($_SERVER['SCRIPT_FILENAME'], $serverDocumentRootLength, $serverScriptFilenameLength-$serverDocumentRootLength-strlen($this->indexPHP)-1);
+		}
+		$this->requestURI = ($this->subDir=='') ? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'], strlen($this->subDir));
+		$request = ltrim($this->requestURI, "/\/\\ \t\n\r\0\x0B");
 		$qPos = strpos($request, '?');
 		$this->variables = explode('/', substr($request, 0, $qPos===false ? 1024 : $qPos));
 		$action = array_shift($this->variables);
