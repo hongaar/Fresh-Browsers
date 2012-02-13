@@ -58,9 +58,12 @@ class core {
 		return $this->template($this->mainTemplate);
 	}
 	
-	public function template($template) {
+	public function template($__template__, $__out__ = null) {
+		if (isset($__out__) && is_array($__out__)) {
+			extract($__out__);
+		}
 		ob_start();
-		require($this->dir.'/tpl/'.$template.'.php');
+		require($this->dir.'/tpl/'.$__template__.'.php');
 		return ob_get_clean();
 	}
 	

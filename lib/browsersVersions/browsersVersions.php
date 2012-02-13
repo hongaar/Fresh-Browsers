@@ -31,14 +31,14 @@ class browsersVersions {
 	public $versions = null;
 
 	public function __construct() {
-		$this->dir = __DIR__;
+		$this->dir = dirname(__FILE__);
 		$this->versionsFile = $this->dir.'/'.$this->versionsFile;
 		$this->wikiLinks = include($this->dir.'/'.$this->links);
 	}
 	
 	
 	// получить список браузеров из конфига
-	// если на вход передан массив, то добавляем версию и дату последнего обновления
+	// если установлен $this->versionsFile, то добавляем версию и дату последнего обновления
 	public function getVersions() {
 	
 		if (file_exists($this->versionsFile)) {
@@ -188,6 +188,22 @@ class browsersVersions {
 			}
 		}
 		return $text;
+	}
+	
+	
+	public function createSh() {
+		$out = '!\bin\sh'."\n";
+		foreach ($this->wikiLinks as $browser=>$branch) {
+			if (!isset($browsersOut[$browser])) {
+				$browsersOut[$browser] = array();
+			}
+			foreach ($branch as $branchName=>$link) {
+				if (!in_array($branchName, $this->excludeLinks)) {
+					$out .= 'curl '.$link.' > '.$browser.'_'.$branchName.".txt\n";
+				}
+			}
+		}
+		file_put_contents($this->dir.'/curl_links_files.sh', $out);		
 	}
 
 	 
