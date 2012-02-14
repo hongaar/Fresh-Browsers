@@ -1,11 +1,14 @@
 <?php
 
+$this->mainTemplate = 'empty.tpl';
 
 $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
 					->execute()
 					->fetchAll();
 
 $versions = $this->lib->browsersVersions->getVersions();
+
+$this->lib->browsersVersions->updateVersions();
 
 $update = $this->lib->db->prepare('UPDATE browsers SET stableVersion=:stableVersion, stableUpdate=:stableUpdate, previewVersion=:previewVersion, previewUpdate=:previewUpdate WHERE id=:id');
 foreach ($browsers as $browser) {
@@ -26,9 +29,3 @@ foreach ($browsers as $browser) {
 			->execute();
 	}
 }
-
-echo '<pre>';
-print_r($browsers);
-echo '<hr>';
-print_r($versions);
-echo '</pre>';

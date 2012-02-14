@@ -29,6 +29,8 @@ class browsersVersions {
 	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
 	public $excludeLinks = array('regexp');
 	public $versions = null;
+	
+	public $error = false;
 
 	public function __construct() {
 		$this->dir = dirname(__FILE__);
@@ -192,18 +194,18 @@ class browsersVersions {
 	
 	
 	public function createSh() {
-		$out = '!\bin\sh'."\n";
+		$out = '#!/bin/sh'."\n";
 		foreach ($this->wikiLinks as $browser=>$branch) {
 			if (!isset($browsersOut[$browser])) {
 				$browsersOut[$browser] = array();
 			}
 			foreach ($branch as $branchName=>$link) {
 				if (!in_array($branchName, $this->excludeLinks)) {
-					$out .= 'curl '.$link.' > '.$browser.'_'.$branchName.".txt\n";
+					$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browser.'_'.$branchName.".txt\n";
 				}
 			}
 		}
-		file_put_contents($this->dir.'/curl_links_files.sh', $out);		
+		$this->error = !file_put_contents($this->dir.'/curl_links_files.sh', $out);		
 	}
 
 	 
