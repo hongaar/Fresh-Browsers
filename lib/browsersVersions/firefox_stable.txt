@@ -1,8 +1,8 @@
 {{LSR
 | article = Firefox
-| latest release version = 10.0
-| latest release date = {{Start date and age|2012|01|31}}
-}}<ref>{{Citation|url=https://www.mozilla.org/en-US/firefox/10.0/releasenotes/|title=Mozilla Firefox Release Notes|date=January 31, 2012}}</ref>
+| latest release version = 10.0.1
+| latest release date = {{Start date and age|2012|02|10}}
+}}<ref>{{Citation|url=https://www.mozilla.org/en-US/firefox/10.0.1/releasenotes/|title=Mozilla Firefox Release Notes|date=February 10, 2012}}</ref>
 <noinclude>
 
 → Back to article "'''[[Firefox]]'''"

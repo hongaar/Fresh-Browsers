@@ -1,5 +1,7 @@
 <?php
 
+$this->mainTemplate = 'empty.tpl';
+
 $exportPath = $this->dir.'/export';
 
 $browsersArr = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')

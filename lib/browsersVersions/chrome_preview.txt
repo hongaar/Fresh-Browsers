@@ -1,15 +1,16 @@
 <!-- Please do not add Canary to the list. Thanks -->
 {{LPR
 |article = Google Chrome 
-|latest_release_version = 17.0.963.46 (Beta)
-|latest_release_date = {{release date and age|2012|1|30}}
+|latest_release_version = 18.0.1025.11 (Beta)
+|latest_release_date = {{release date and age|2012|02|9}}
 }}
 
 {{LPR
 |article = Google Chrome 
-|latest_release_version = 19.0.1031.0 (Dev)
-|latest_release_date = {{release date and age|2012|2|6}}
+|latest_release_version = 19.0.1036.7 (Dev)
+|latest_release_date = {{release date and age|2012|02|10}}
 }}
+
 <noinclude>
 
 [[Category:Latest preview software release templates|Google Chrome]]

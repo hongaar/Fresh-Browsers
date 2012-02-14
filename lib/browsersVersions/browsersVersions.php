@@ -141,25 +141,25 @@ class browsersVersions {
 		$versions = false;
 		$text = $this->getWikiText($browserName, $browserBranch);
 		if ($text!==false) {
-				$regexp = $this->wikiLinks[$browserName]['regexp'];
-				preg_match_all($regexp['version'], $text, $ver);
-				preg_match_all($regexp['date'], $text, $date);
-				if (isset($ver[1]) && !empty($ver[1])) {
-					$versions = array();
-					$dates = array();
-					foreach ($ver[1] as $n=>$version) {
-						if (isset($date[2][$n]) && isset($date[3][$n]) && isset($date[4][$n])) {
-							$dateTimeStamp = mktime(0, 0, 0, $date[3][$n], $date[4][$n], $date[2][$n]);
-							if ($dateTimeStamp===false || $dateTimeStamp<0) {
-								$dateTimeStamp = 0;
-							}
-						} else {
+			$regexp = $this->wikiLinks[$browserName]['regexp'];
+			preg_match_all($regexp['version'], $text, $ver);
+			preg_match_all($regexp['date'], $text, $date);
+			if (isset($ver[1]) && !empty($ver[1])) {
+				$versions = array();
+				$dates = array();
+				foreach ($ver[1] as $n=>$version) {
+					if (isset($date[2][$n]) && isset($date[3][$n]) && isset($date[4][$n])) {
+						$dateTimeStamp = mktime(0, 0, 0, $date[3][$n], $date[4][$n], $date[2][$n]);
+						if ($dateTimeStamp===false || $dateTimeStamp<0) {
 							$dateTimeStamp = 0;
 						}
-						$versions[] = array('version'=>$version, 'date'=>$dateTimeStamp);
+					} else {
+						$dateTimeStamp = 0;
 					}
+					$versions[] = array('version'=>$version, 'date'=>$dateTimeStamp);
 				}
-				return $versions;
+			}
+			return $versions;
 		}		
 		return $versions;
 		

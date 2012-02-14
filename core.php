@@ -72,6 +72,7 @@ class core {
 	}
 	
 	public function template($__template__, $__out__ = null) {
+
 		if (isset($__out__) && is_array($__out__)) {
 			extract($__out__);
 		}
