@@ -156,7 +156,7 @@ class browsersVersions {
 					} else {
 						$dateTimeStamp = 0;
 					}
-					$versions[] = array('version'=>$version, 'date'=>$dateTimeStamp);
+					$versions[] = array('version'=>trim($version), 'date'=>$dateTimeStamp);
 				}
 			}
 			return $versions;

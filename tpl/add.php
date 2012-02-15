@@ -1,5 +1,11 @@
 <?php
 
+$this->edit = false;
+
+if (!$this->edit) {
+	return false;
+}
+
 
 $browsersArr = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
 						->execute()

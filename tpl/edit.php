@@ -1,6 +1,6 @@
 <?php
 
-$this->edit = true;
+$this->edit = false;
 
 if (!$this->edit) {
 	return false;

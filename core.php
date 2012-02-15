@@ -61,13 +61,12 @@ class core {
 	}	
 	
 	public function view() {
-		$this->template = isset($template) ? $template : $this->action;
-		if (!file_exists($this->dir.'/tpl/'.$this->template.'.php')) {
+		if (!file_exists($this->dir.'/tpl/'.$this->action.'.php')) {
 			header("HTTP/1.0 404 Not Found");
 			header("Status: 404 Not Found");
-			$this->template = 'error404';
+			$this->action = 'error404';
 		}
-		$this->out = $this->template($this->template);
+		$this->out = $this->template($this->action);
 		return $this->template($this->mainTemplate);
 	}
 	
