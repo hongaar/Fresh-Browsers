@@ -11,6 +11,12 @@ $branches = array(
 	4	=>	'Dev',
 );
 
+if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($branches[$_GET['branch']])) {
+	$branchId = intval($_GET['branch']);
+} else {
+	$branchId = 1;
+}
+
 $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
 					->execute()
 					->fetchAll();
@@ -22,10 +28,10 @@ foreach ($browsers as $browser) {
 
 		
 		
-$historyArr = $this->lib->db->prepare('SELECT * FROM history ORDER BY browserId, releaseDate DESC LIMIT 1000')
+$historyArr = $this->lib->db->prepare('SELECT * FROM history WHERE branch=:branch ORDER BY browserId, releaseDate DESC LIMIT 1000')
+						->bind(':branch', $branchId)
 						->execute()
 						->fetchAll();
-					
 $history = array();
 foreach ($historyArr as $historyObj) {
 	$history[$historyObj['browserId']][$historyObj['branch']][] = $historyObj;
@@ -46,10 +52,10 @@ foreach ($browsers as $browser) {
 	<br>
 	<ul class="unstyled">
 		<?php
-		if (isset($history[$browser['id']][1])) {
-			foreach ($history[$browser['id']][1] as $historyObj) {
+		if (isset($history[$browser['id']][$branchId])) {
+			foreach ($history[$browser['id']][$branchId] as $historyObj) {
 			?>
-				<li><?=$historyObj['releaseVersion']?> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span><?=$this->edit?' <a href="/edit/'.$historyObj['id'].'" class="icon-edit"></a> <a href="/remove/'.$historyObj['id'].'" class="icon-remove"></a>':''?></li>
+				<li><?=$historyObj['releaseVersion']?> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span><?=$this->edit?' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>':''?></li>
 			<?php
 			}
 		}

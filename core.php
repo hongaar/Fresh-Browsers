@@ -81,4 +81,8 @@ class core {
 		return ob_get_clean();
 	}
 	
+	public function link ($link) {
+		return $this->subDir.$link;
+	}
+	
 }

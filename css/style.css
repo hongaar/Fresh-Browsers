@@ -2,7 +2,7 @@
 	text-align:center;
 }
 .browser {
-	background: url("/img/browsers.png") no-repeat top center;
+	background: url("../img/browsers.png") no-repeat top center;
 	width:52px;
 	height:52px;
 	margin:0 auto;

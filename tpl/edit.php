@@ -103,9 +103,6 @@ if (isset($_POST) && !empty($_POST)) {
 			$result->bind(':id', $historyId);
 		}
 		$result->execute();
-				
-		echo $historyId;
-		print_r($result->errorInfo());
 		
 		if ($result!==false) {
 			echo '<br><br><div class="alert alert-success">'
