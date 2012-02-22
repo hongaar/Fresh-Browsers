@@ -7,7 +7,7 @@
 
 $this->mainTemplate = 'empty.tpl';
 
-$forceExport = false;
+$forceExport = true;
 
 $exportPath = $this->dir.'/export';
 
@@ -105,9 +105,7 @@ if (!empty($updatedNames) || $forceExport) {
 
 	file_put_contents($exportPath.'/browsers.yaml', $this->lib->sfYaml->dump($browsersExport));
 
-//	file_put_contents($exportPath.'/browsers-short.html', $this->template('browsers-short.tpl', array('browsers'=>$browsers)));
-
-	file_put_contents($exportPath.'/browsers.html', $this->template('browsers-full.tpl', array('browsers'=>$browsers)));
+	file_put_contents($exportPath.'/browsers.html', $this->template('browsers.tpl', array('browsers'=>$browsers)));
 }
 
 
