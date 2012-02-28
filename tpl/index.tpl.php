@@ -7,8 +7,8 @@
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="css/style.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/css/style.css" rel="stylesheet">
 </head>
 
 <body>
@@ -25,8 +25,12 @@
 		<li<?=$this->action=='history'?' class="active"':''?>><a href="<?=$this->link('/history')?>">History</a></li>
 		<li<?=$this->action=='about'?' class="active"':''?>><a href="<?=$this->link('/about')?>">About</a></li>
     </ul>
+	
+	<div id="content">
 
 	<?=$this->out?>
+	
+	</div>
 
 	<hr>
 	

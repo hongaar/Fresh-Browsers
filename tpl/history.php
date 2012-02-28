@@ -3,15 +3,30 @@
 $this->edit = false;
 
 
-$branches = array(
-	-1	=>	'---',
-	1	=>	'Stable',
-	2	=>	'LTS',
-	3	=>	'Preview',
-	4	=>	'Dev',
-);
+if (isset($this->variables[0])) {
+	$id = (int) $this->variables[0];
+	$obj = $this->lib->db->prepare('SELECT * FROM history WHERE id=:id')
+						->bind(':id', $id)
+						->execute()
+						->fetch();
+	if ($obj!==false) {
+	
+		$browsers = $this->lib->browsersVersions->getBrowsers();
 
-if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($branches[$_GET['branch']])) {
+		?>
+		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.$this->lib->browsersVersions->branches[$obj['branch']].')'?></h1>
+		<p>Released: <?=date('Y-m-d', $obj['releaseDate'])?></p>
+		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
+		<br>
+		<a href="/history">&larr; Back to history</a>
+		<?php
+		return true;
+	} 
+	
+}
+
+
+if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($this->lib->browsersVersions->branches[$_GET['branch']])) {
 	$branchId = intval($_GET['branch']);
 } else {
 	$branchId = 1;
@@ -55,7 +70,7 @@ foreach ($browsers as $browser) {
 		if (isset($history[$browser['id']][$branchId])) {
 			foreach ($history[$browser['id']][$branchId] as $historyObj) {
 			?>
-				<li><?=$historyObj['releaseVersion']?> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span><?=$this->edit?' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>':''?></li>
+				<li><a href="/history/<?=$historyObj['id']?>" title="<?=$browser['name'].' '.$historyObj['releaseVersion']?>"><?=$historyObj['releaseVersion']?></a> <span class="date"><?=date('Y-m-d',$historyObj['releaseDate'])?></span><?=$this->edit?' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>':''?></li>
 			<?php
 			}
 		}

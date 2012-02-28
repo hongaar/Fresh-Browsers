@@ -1,6 +1,6 @@
 <?php
 
-$this->edit = false;
+$this->edit = true;
 
 if (!$this->edit) {
 	return false;
@@ -19,13 +19,8 @@ foreach ($browsersArr as $browser) {
 	$browsersValues[$browser['id']] = $browser['name'];
 }
 
-$branches = array(
-	-1	=>	'---',
-	1	=>	'Stable',
-	2	=>	'LTS',
-	3	=>	'Preview',
-	4	=>	'Dev',
-);
+$branches = $this->lib->browsersVersions->branches;
+$branches[-1] = '---';
 
 $values = array(
 	'browser'	=>	-1,
@@ -49,7 +44,7 @@ if (isset($this->variables[0])) {
 			'branch'	=>	$historyObj['branch'],
 			'version'	=>	$historyObj['releaseVersion'],
 			'date'		=>	date('Y-m-d', $historyObj['releaseDate']),
-			'note'		=>	'' // $historyObj['note'],
+			'note'		=>	$historyObj['note'],
 		);
 		$releaseTime = $historyObj['releaseDate'];
 		$historyId = $id;

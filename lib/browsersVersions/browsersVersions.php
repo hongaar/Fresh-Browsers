@@ -29,13 +29,37 @@ class browsersVersions {
 	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
 	public $excludeLinks = array('regexp');
 	public $versions = null;
+	public $db = null;
+	
+	public $branches = array(
+		1	=>	'Stable',
+		2	=>	'LTS',
+		3	=>	'Preview',
+		4	=>	'Dev',
+	);
 	
 	public $error = false;
 
-	public function __construct() {
+	public function __construct($db=null) {
 		$this->dir = dirname(__FILE__);
 		$this->versionsFile = $this->dir.'/'.$this->versionsFile;
 		$this->wikiLinks = include($this->dir.'/'.$this->links);
+		if (isset($db)) {
+			$this->db = $db;
+		}
+	}
+	
+	
+	public function getBrowsers() {
+		$browsers = array();
+		$browsersArr = $this->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
+								->execute()
+								->fetchAll();		
+		foreach ($browsersArr as $browser) {
+			$browsers[$browser['id']] = $browser;
+		}
+		return $browsers;
+		
 	}
 	
 	

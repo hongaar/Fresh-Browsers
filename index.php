@@ -14,9 +14,10 @@
 require('core.php');
 $core = new core();
 $core->libs = array(
-					't'		=>	array('translate'),
-					'pdo'	=>	array('PDO', 'sqlite:'.$core->dir.'/versions/browsers.sqlite'),
-					'db'	=>	array('PDOWrapper', '@pdo'),
+						't'		=>	array('translate'),
+						'pdo'	=>	array('PDO', 'sqlite:'.$core->dir.'/versions/browsers.sqlite'),
+						'db'	=>	array('PDOWrapper', '@pdo'),
+						'browsersVersions'	=>	array('browsersVersions', '@db'),
 					);
 echo $core->render();
 

@@ -9,3 +9,4 @@ export/browsers.yaml
 lib/browsersVersions/curl_links_files.sh
 update.sh
 tpl/createsh.php
+/favicon.ico
