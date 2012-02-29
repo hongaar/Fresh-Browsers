@@ -81,7 +81,7 @@ class core {
 	}
 	
 	public function link ($link) {
-		return $this->subDir.$link;
+		return $this->subDir.((isset($link{0}) && $link{0}!='/')?'/':'').$link;
 	}
 	
 }
