@@ -22,14 +22,16 @@ class browsersVersions {
 	public $versionsFile = 'versions.json';
 	public $updatePeriod = 0; // 86400;
 	
+	public $banTimeOut = 86400; // банить версию на сутки
+	
 	public $lockTimeOut = 600;
 	public $curl = false;
 	
-	public $toBeUpdated = array();
 	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
-	public $excludeLinks = array('regexp');
-	public $versions = null;
 	public $db = null;
+	
+	public $approveLink = 'http://www.elfimov.ru/browsers/approve';
+	public $approveEmail = 'elfimov@gmail.com';
 	
 	public $branches = array(
 		1	=>	'Stable',
@@ -37,6 +39,9 @@ class browsersVersions {
 		3	=>	'Preview',
 		4	=>	'Dev',
 	);
+	
+	public $versions = null;
+	public $browsers = null;
 	
 	public $error = false;
 
@@ -49,95 +54,200 @@ class browsersVersions {
 		}
 	}
 	
-	
 	public function getBrowsers() {
-		$browsers = array();
-		$browsersArr = $this->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
-								->execute()
-								->fetchAll();		
-		foreach ($browsersArr as $browser) {
-			$browsers[$browser['id']] = $browser;
+		if (!isset($this->browsers)) {
+			$result = $this->db->prepare('SELECT * FROM browsers LIMIT 100')
+								->execute();
+			$this->browsers = array();
+			while ($browser = $result->fetchAssoc()) {
+				$this->browsers[$browser['id']] = $browser;
+			}
 		}
-		return $browsers;
+		return $this->browsers;
+	}
+	
+	public function getBranches() {
+		return $this->branches;
+	}
+	
+	
+	public function getVersions() {
+		if (!isset($this->versions)) {
+			$this->versions = array();
+			$result = $this->db->prepare('SELECT * FROM history GROUP BY branchId, browserId ORDER BY releaseDate DESC')
+								->execute();
+			while ($browser = $result->fetchAssoc()) {
+				$this->versions[$browser['browserId']][$browser['branchId']] = array(
+					'releaseVersion'	=> $browser['releaseVersion'],
+					'releaseDate'		=> $browser['releaseDate'],
+					'__modified'		=> $browser['__modified'],
+					'__id'				=> $browser['id'],
+				);
+			}
+		}
+		return $this->versions;
+	}
+	
+	
+	public function newVersion($new, $current, $browserId, $branchId) {
+	
+		if ($this->isBanned($new)) {
+			return false;
+		}
+		
+		$code = md5(uniqid(rand()));
+		
+		$result = $this->db->prepare('INSERT INTO browserCheck (browserId, branchId, releaseVersion, releaseDate, code, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :code, :modified)')
+			->bind(':browserId', $browserId)
+			->bind(':branchId', $branchId)
+			->bind(':releaseVersion', $new['releaseVersion'])
+			->bind(':releaseDate', $new['releaseDate'])
+			->bind(':code', $code)
+			->bind(':modified', time())
+			->execute();
+		
+		if ($result===false) {
+			return false;
+		}
+					
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
+		
+		$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
+		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n";
+					. 'New: '.$new['releaseVersion'] . "\n"
+					. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
+					. 'Approve: '.$this->approveLink.'/yes/?code='.$code . "\n"
+					. 'Delete: '.$this->approveLink.'/no/?code='.$code . "\n";
+		
+		$headers = 'From: Fresh Browsers <' . $this->approveEmail . '>' . "\n" 
+					. 'Reply-To: ' . $this->approveEmail . "\n";
+			
+		$result = mail($this->approveEmail, $subject, $message, $headers);
+		
+		if ($result===false) {
+			return false;
+		}
 		
 	}
 	
 	
-	// получить список браузеров из конфига
-	// если установлен $this->versionsFile, то добавляем версию и дату последнего обновления
-	public function getVersions() {
-	
-		if (file_exists($this->versionsFile)) {
-			$browsersValues = json_decode(file_get_contents($this->versionsFile), true);
-		} else {
-			$browsersValues = array();
+	public function approveNewVersion($code) {
+		$version = $this->getCheckByCode($code);
+		
+		if ($version===false) {
+			// ошибка при получении версии из временной таблицы
+			return false;
+		} 
+		
+		if ($this->addVersion($version)===false) {
+			// ошибка при добавлении новой версии
+			return false;
 		}
 		
-		$browsersOut = array();
-		foreach ($this->wikiLinks as $browser=>$branch) {
-			if (!isset($browsersOut[$browser])) {
-				$browsersOut[$browser] = array();
-			}
-			foreach ($branch as $branchName=>$link) {
-				if (!in_array($branchName, $this->excludeLinks)) {
-					if (isset($browsersValues[$browser][$branchName])) {
-						$releaseVersion = $browsersValues[$browser][$branchName]['releaseVersion'];
-						$lastUpdate = $browsersValues[$browser][$branchName]['lastUpdate'];
-						$releaseDate = $browsersValues[$browser][$branchName]['releaseDate'];
-					} else {
-						$releaseVersion = 0;
-						$lastUpdate	= 0;
-						$releaseDate = 0;
-					}
-					$browsersOut[$browser][$branchName] = array(
-															'releaseVersion'=>	$releaseVersion,
-															'releaseDate'	=>	$releaseDate,
-															'lastUpdate'	=>	$lastUpdate,
-														);
-				}
-			}
+		return $this->db->prepare('DELETE FROM browserCheck WHERE id=:id')
+					->bind(':id', $version['id'])
+					->execute();
+	}
+	
+	
+	public function deleteNewVersion($code) {
+		$version = $this->getCheckByCode($code);
+		
+		if ($version===false) {
+			// ошибка при получении версии из временной таблицы
+			return false;
 		}
-		return $browsersOut;
+		
+		$this->addToBan($version);
+		
+		return $this->db->prepare('DELETE FROM browserCheck WHERE id=:id')
+					->bind(':id', $version['id'])
+					->execute();
+	}
+	
+	
+	public function addToBan($version) {
+		return $result = $this->db->prepare('INSERT INTO bannedVersion (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
+									->bind(':browserId', $version['browserId'])
+									->bind(':branchId', $version['branchId'])
+									->bind(':releaseVersion', $version['releaseVersion'])
+									->bind(':releaseDate', $version['releaseDate'])
+									->bind(':modified', time())
+									->execute();
+	}
+	
+	
+	public function isBanned($version) {
+		$count = $this->db->prepare('SELECT * FROM bannedVersion WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate AND __modified>:modified')
+							->bind(':browserId', $version['browserId'])
+							->bind(':branchId', $version['branchId'])
+							->bind(':releaseVersion', $version['releaseVersion'])
+							->bind(':releaseDate', $version['releaseDate'])
+							->bind(':modified', time()-$this->banTimeOut)
+							->execute()
+							->rowCount();
+		return $count > 0;
+	}
+	
+	public function addVersion($version) {
+	
+		return $this->db->prepare('INSERT INTO history (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
+			->bind(':browserId', $version['browserId'])
+			->bind(':branchId', $version['browserId'])
+			->bind(':releaseVersion', $version['releaseVersion'])
+			->bind(':releaseDate', $version['releaseDate'])
+			->bind(':modified', time())
+			->execute();
+	
 	}
 
-	
-	
+
+	public function getCheckByCode($code) {
+		return $this->db->prepare('SELECT * FROM browserCheck WHERE code=:code')
+					->bind(':code', $code)
+					->fetchAssoc();
+	}
+
+
 	public function updateVersions() {
 	
 		if ($this->isLock()) {
 			return false;
 		}
 		
+		$update = array();
+		
 		$this->setLock();
 		
-		if (!isset($this->versions)) {
-			$this->versions = $this->getVersions();
-		}
+		$versions = $this->getVersions();
 	
-		foreach ($this->versions as $browserName=>$branch) {
-			foreach ($branch as $branchName=>$values) {
-				if ((time()-$values['lastUpdate']) >= $this->updatePeriod) {
-					$this->toBeUpdated[] = array('name'=>$browserName, 'branch'=>$branchName);
+		foreach ($versions as $browserId=>$branch) {
+			foreach ($branch as $branchId=>$values) {
+				if ((time()-$values['__modified']) >= $this->updatePeriod) {
+					$update[] = array('browserId'=>$browserId, 'branchId'=>$branchId);
 				}
 			}
 		}
 
-		foreach ($this->toBeUpdated as $browser) {
-			$release = $this->getVersionFromWikiText($browser['name'], $browser['branch']);
-			
-			if ($release!==false) {
-				$this->versions[$browser['name']][$browser['branch']] = array(
-														'releaseVersion'=>	$release[0]['version'],
-														'releaseDate'	=>	$release[0]['date'],
-														'lastUpdate'	=>	time(),
-														);
-														
-				file_put_contents($this->versionsFile, json_encode($this->versions));
+		foreach ($update as $browser) {
+			$new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
+			if ($new!==false) {
+				$current = $versions[$browser['browserId']][$browser['branchId']];
+				if (isset($new['releaseDate'])  && isset($new['releaseVersion'])
+					&& trim($new['releaseVersion']) != ''
+					&& $new['releaseDate'] > $current['releaseDate']) {
+					if ($this->newVersion($new, $current, $browser['browserId'], $browser['branchId'])===false) {
+						$update = false;
+						break;
+					}
+				}
 			}
 		}
 		
 		$this->removeLock();
 		
+		return $update;
 	}
 	
 	
@@ -160,7 +270,13 @@ class browsersVersions {
 	}
 	
 	
-	public function getVersionFromWikiText($browserName, $browserBranch) {
+	public function getVersionFromWikiText($browserId, $branchId) {
+	
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
+	
+		$browserName = $browsers[$browserId]['shortName'];
+		$browserBranch = $branches[$branchId];
 	
 		$versions = false;
 		$text = $this->getWikiText($browserName, $browserBranch);
@@ -180,21 +296,21 @@ class browsersVersions {
 					} else {
 						$dateTimeStamp = 0;
 					}
-					$versions[] = array('version'=>trim($version), 'date'=>$dateTimeStamp);
+					$versions = array('releaseVersion'=>trim($version), 'releaseDate'=>$dateTimeStamp);
+					break;
 				}
 			}
-			return $versions;
 		}		
 		return $versions;
 		
 	}
 	
 	
-	public function getWikiText($browserName, $browserBranch) {
+	public function getWikiText($browserName, $branchName) {
 		if ($this->curl) {
 			$ch = curl_init();
 			$options = array(
-				CURLOPT_URL				=>	$this->wikiLinks[$browserName][$browserBranch],
+				CURLOPT_URL				=>	$this->wikiLinks[$browserName][$branchName],
 				CURLOPT_RETURNTRANSFER	=>	true,
 				CURLOPT_FOLLOWLOCATION	=>	true,
 				CURLOPT_MAXREDIRS		=>	10,
@@ -206,7 +322,7 @@ class browsersVersions {
 			$text = curl_exec($ch);
 			curl_close($ch);
 		} else {
-			$filename = $this->dir.'/'.$browserName.'_'.$browserBranch.'.txt';
+			$filename = $this->dir.'/'.$browserName.'_'.$branchName.'.txt';
 			if (file_exists($filename)) {
 				$text = file_get_contents($filename);
 			} else {
@@ -218,14 +334,12 @@ class browsersVersions {
 	
 	
 	public function createSh() {
+		$branches = $this->getBranches();
 		$out = '#!/bin/sh'."\n";
-		foreach ($this->wikiLinks as $browser=>$branch) {
-			if (!isset($browsersOut[$browser])) {
-				$browsersOut[$browser] = array();
-			}
+		foreach ($this->wikiLinks as $browserName=>$branch) {
 			foreach ($branch as $branchName=>$link) {
-				if (!in_array($branchName, $this->excludeLinks)) {
-					$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browser.'_'.$branchName.".txt\n";
+				if (in_array($branchName, $branches)) {
+					$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
 				}
 			}
 		}

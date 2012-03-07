@@ -25,36 +25,36 @@ class PDOWrapperStatement {
 	
 	
 	public function prepare($query) {
-        $this->statement = $this->handler->prepare($query);
+		$this->statement = $this->handler->prepare($query);
 		return $this;
 	}
 
     public function bind($pos, $value, $type = null) {
 
-        if (is_null($type) ) {
-            switch (true) {
-                case is_int($value):
-                    $type = PDO::PARAM_INT;
-                    break;
-                case is_bool($value):
-                    $type = PDO::PARAM_BOOL;
-                    break;
-                case is_null($value):
-                    $type = PDO::PARAM_NULL;
-                    break;
-                default:
-                    $type = PDO::PARAM_STR;
-            }
-        }
+		if (is_null($type) ) {
+			switch (true) {
+				case is_int($value):
+					$type = PDO::PARAM_INT;
+					break;
+				case is_bool($value):
+					$type = PDO::PARAM_BOOL;
+					break;
+				case is_null($value):
+					$type = PDO::PARAM_NULL;
+					break;
+				default:
+					$type = PDO::PARAM_STR;
+			}
+		}
 
-        $this->statement->bindValue($pos, $value, $type);
-        return $this;
+		$this->statement->bindValue($pos, $value, $type);
+		return $this;
     }
 	
 
     public function execute(array $parameters=null) {
 		$this->error = !$this->statement->execute();
-        return $this;
+		return $this;
     }
 	
 	public function errorCode() {
@@ -66,7 +66,7 @@ class PDOWrapperStatement {
 	}
 	
     public function fetch($fetchStyle=PDO::FETCH_ASSOC) {
-        return $this->statement->fetch($fetchStyle);
+		return $this->statement->fetch($fetchStyle);
     }
 	
 	
@@ -76,9 +76,12 @@ class PDOWrapperStatement {
 	
 
     public function fetchAll($fetchStyle=PDO::FETCH_ASSOC) {
-        return $this->statement->fetchAll($fetchStyle);
+		return $this->statement->fetchAll($fetchStyle);
     }
-
+	
+	 public function rowCount() {
+		return $this->statement->rowCount();
+	 }
 
 
 }
