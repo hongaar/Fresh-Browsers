@@ -24,7 +24,7 @@ class browsersVersions {
 	
 	public $banTimeOut = 86400; // банить версию на сутки
 	
-	public $lockTimeOut = 600;
+	public $lockTimeOut = 600; // 600
 	public $curl = false;
 	
 	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
@@ -43,7 +43,7 @@ class browsersVersions {
 	public $versions = null;
 	public $browsers = null;
 	
-	public $error = false;
+	public $errors = array();
 
 	public function __construct($db=null) {
 		$this->dir = dirname(__FILE__);
@@ -59,7 +59,7 @@ class browsersVersions {
 			$result = $this->db->prepare('SELECT * FROM browsers LIMIT 100')
 								->execute();
 			$this->browsers = array();
-			while ($browser = $result->fetchAssoc()) {
+			while ($browser = $result->fetch()) {
 				$this->browsers[$browser['id']] = $browser;
 			}
 		}
@@ -76,7 +76,7 @@ class browsersVersions {
 			$this->versions = array();
 			$result = $this->db->prepare('SELECT * FROM history GROUP BY branchId, browserId ORDER BY releaseDate DESC')
 								->execute();
-			while ($browser = $result->fetchAssoc()) {
+			while ($browser = $result->fetch()) {
 				$this->versions[$browser['browserId']][$browser['branchId']] = array(
 					'releaseVersion'	=> $browser['releaseVersion'],
 					'releaseDate'		=> $browser['releaseDate'],
@@ -114,8 +114,8 @@ class browsersVersions {
 		$branches = $this->getBranches();
 		
 		$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
-		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n";
-					. 'New: '.$new['releaseVersion'] . "\n"
+		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
+					. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
 					. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
 					. 'Approve: '.$this->approveLink.'/yes/?code='.$code . "\n"
 					. 'Delete: '.$this->approveLink.'/no/?code='.$code . "\n";
@@ -168,7 +168,7 @@ class browsersVersions {
 	
 	
 	public function addToBan($version) {
-		return $result = $this->db->prepare('INSERT INTO bannedVersion (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
+		return $result = $this->db->prepare('INSERT INTO bannedVersions (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
 									->bind(':browserId', $version['browserId'])
 									->bind(':branchId', $version['branchId'])
 									->bind(':releaseVersion', $version['releaseVersion'])
@@ -179,7 +179,7 @@ class browsersVersions {
 	
 	
 	public function isBanned($version) {
-		$count = $this->db->prepare('SELECT * FROM bannedVersion WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate AND __modified>:modified')
+		$count = $this->db->prepare('SELECT * FROM bannedVersions WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate AND __modified>:modified')
 							->bind(':browserId', $version['browserId'])
 							->bind(':branchId', $version['branchId'])
 							->bind(':releaseVersion', $version['releaseVersion'])
@@ -206,7 +206,7 @@ class browsersVersions {
 	public function getCheckByCode($code) {
 		return $this->db->prepare('SELECT * FROM browserCheck WHERE code=:code')
 					->bind(':code', $code)
-					->fetchAssoc();
+					->fetch();
 	}
 
 
@@ -221,7 +221,7 @@ class browsersVersions {
 		$this->setLock();
 		
 		$versions = $this->getVersions();
-	
+
 		foreach ($versions as $browserId=>$branch) {
 			foreach ($branch as $branchId=>$values) {
 				if ((time()-$values['__modified']) >= $this->updatePeriod) {
@@ -234,12 +234,16 @@ class browsersVersions {
 			$new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
 			if ($new!==false) {
 				$current = $versions[$browser['browserId']][$browser['branchId']];
+//				echo date('Y-m-d',$new['releaseDate']) .'>'. date('Y-m-d',$current['releaseDate']).'<hr>';
 				if (isset($new['releaseDate'])  && isset($new['releaseVersion'])
 					&& trim($new['releaseVersion']) != ''
-					&& $new['releaseDate'] > $current['releaseDate']) {
+//					&& $new['releaseDate'] > $current['releaseDate']
+					) {
 					if ($this->newVersion($new, $current, $browser['browserId'], $browser['branchId'])===false) {
-						$update = false;
-						break;
+						// $update = false;
+						// break;
+						// ошибка при добавлении новой версии. м.б. добавлять ошибку
+						$this->errors[] = 'browserId'.$browser['browserId'].'; branchId:'.$browser['branchId'].'; version:'.$new['releaseVersion'].'; date:'.$new['releaseDate'];
 					}
 				}
 			}
@@ -275,7 +279,7 @@ class browsersVersions {
 		$browsers = $this->getBrowsers();
 		$branches = $this->getBranches();
 	
-		$browserName = $browsers[$browserId]['shortName'];
+		$browserName = strtolower($browsers[$browserId]['shortName']);
 		$browserBranch = $branches[$branchId];
 	
 		$versions = false;
@@ -296,7 +300,7 @@ class browsersVersions {
 					} else {
 						$dateTimeStamp = 0;
 					}
-					$versions = array('releaseVersion'=>trim($version), 'releaseDate'=>$dateTimeStamp);
+					$versions = array('browserId'=>$browserId, 'branchId'=>$branchId, 'releaseVersion'=>trim($version), 'releaseDate'=>$dateTimeStamp);
 					break;
 				}
 			}
@@ -343,7 +347,7 @@ class browsersVersions {
 				}
 			}
 		}
-		$this->error = !file_put_contents($this->dir.'/curl_links_files.sh', $out);		
+		return file_put_contents($this->dir.'/curl_links_files.sh', $out);		
 	}
 
 	 
