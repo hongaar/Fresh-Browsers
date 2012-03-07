@@ -79,9 +79,13 @@ class PDOWrapperStatement {
 		return $this->statement->fetchAll($fetchStyle);
     }
 	
-	 public function rowCount() {
+	public function rowCount() {
 		return $this->statement->rowCount();
-	 }
+	}
+
+	public function columnCount() {
+		return $this->statement->columnCount();
+	}
 
 
 }

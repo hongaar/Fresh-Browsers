@@ -2,18 +2,22 @@
 
 $this->mainTemplate = 'empty.tpl';
 
-if ($this->variables[0]=='yes') {
-	$result = $this->lib->browsersVersions->approveNewVersion();
-	if ($result===false) {
-		// ошибка
-	}
-} else 
-if ($this->variables[0]=='no') {
-	$result = $this->lib->browsersVersions->deleteNewVersion();
-	if ($result===false) {
-		// ошибка
-	}
-} else {
-	// неправильная ссылка
+if (isset($this->variables[1])) {
+	if ($this->variables[0]=='yes') {
+		$browser = $this->lib->browsersVersions->approveNewVersion($this->variables[1]);
+		if ($browser===false) {
+			echo implode('<br>', $this->lib->browsersVersions->errors);
+		} else {
+			echo 'APPROVED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date('Y-m-d',$browser['releaseDate']);
+		}
+	} else 
+	if ($this->variables[0]=='no') {
+		$browser = $this->lib->browsersVersions->deleteNewVersion($this->variables[1]);
+		if ($browser===false) {
+			echo implode('<br>', $this->lib->browsersVersions->errors);
+		} else {
+			echo 'DELETED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date('Y-m-d',$browser['releaseDate']);
+		}
+	} 
 }
 

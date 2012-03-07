@@ -13,4 +13,4 @@ Todo
 	2. Send email to specified address
 	3. Click commit link in email
 	4. Autoupdate (configurable) if >=2 days passed
-* Display history by months grid
+* Display history in months grid

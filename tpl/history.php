@@ -43,13 +43,13 @@ foreach ($browsers as $browser) {
 
 		
 		
-$historyArr = $this->lib->db->prepare('SELECT * FROM history WHERE branch=:branch ORDER BY browserId, releaseDate DESC LIMIT 1000')
-						->bind(':branch', $branchId)
+$historyArr = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC LIMIT 1000')
+						->bind(':branchId', $branchId)
 						->execute()
 						->fetchAll();
 $history = array();
 foreach ($historyArr as $historyObj) {
-	$history[$historyObj['browserId']][$historyObj['branch']][] = $historyObj;
+	$history[$historyObj['browserId']][$historyObj['branchId']][] = $historyObj;
 }
 ?>
 

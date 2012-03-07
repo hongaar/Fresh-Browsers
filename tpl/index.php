@@ -26,6 +26,7 @@ $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName L
 	<li><a href="http://www.elfimov.ru/browsers/export/browsers.json">JSON</a></li>
 	<li><a href="http://www.elfimov.ru/browsers/export/browsers.serialized">PHP serialized</a></li>
 	<li><a href="http://www.elfimov.ru/browsers/export/browsers.html">HTML</a></li>
+	<li><a href="http://www.elfimov.ru/browsers/rss">RSS</a></li>
 </ul>
 </blockquote>
 
