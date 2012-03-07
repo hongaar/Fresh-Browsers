@@ -95,6 +95,8 @@ class browsersVersions {
 			return false;
 		}
 		
+		// TODO: проверить есть ли версия в browserCheck и если она там дольше определенного времени - не отправлять и не добавлять
+		
 		$code = md5(uniqid(rand()));
 		
 		$result = $this->db->prepare('INSERT INTO browserCheck (browserId, branchId, releaseVersion, releaseDate, code, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :code, :modified)')
