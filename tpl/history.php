@@ -2,6 +2,7 @@
 
 $this->edit = false;
 
+$branches = $this->lib->browsersVersions->getBranches();
 
 if (isset($this->variables[0])) {
 	$id = (int) $this->variables[0];
@@ -14,7 +15,7 @@ if (isset($this->variables[0])) {
 		$browsers = $this->lib->browsersVersions->getBrowsers();
 
 		?>
-		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.$this->lib->browsersVersions->branches[$obj['branch']].')'?></h1>
+		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.$branches[$obj['branchId']].')'?></h1>
 		<p>Released: <?=date('Y-m-d', $obj['releaseDate'])?></p>
 		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
 		<br>
@@ -26,7 +27,7 @@ if (isset($this->variables[0])) {
 }
 
 
-if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($this->lib->browsersVersions->branches[$_GET['branch']])) {
+if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($branches[$_GET['branch']])) {
 	$branchId = intval($_GET['branch']);
 } else {
 	$branchId = 1;
@@ -43,24 +44,23 @@ foreach ($browsers as $browser) {
 
 		
 		
-$historyArr = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC LIMIT 1000')
+$result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC LIMIT 1000')
 						->bind(':branchId', $branchId)
-						->execute()
-						->fetchAll();
+						->execute();
 $history = array();
-foreach ($historyArr as $historyObj) {
-	$history[$historyObj['browserId']][$historyObj['branchId']][] = $historyObj;
+while ($browser = $result->fetch()) {
+	$history[$browser['browserId']][$browser['branchId']][] = $browser;
 }
 ?>
 
 <div class="row">
 
 <?php
-foreach ($browsers as $browser) {
-//	$shortName = strtolower($browser['shortName']);
+foreach ($browsers as $browserId => $browser) {
+$shortName = strtolower($browser['shortName']);
 ?>
 <div class="span2 browsers">
-	<div class="browser" id="browser_<?=$browser['shortName']?>"><a href="<?=$browser['link']?>"></a></div>
+	<div class="browser" id="browser_<?=$shortName?>"><a href="<?=$browser['link']?>"></a></div>
 	<h4><a href="<?=$browser['link']?>"><?=$browser['name']?></a></h4>
 	<!-- h5><?=$browser['stableVersion']?></h5>
 	<h6>(<?=date('Y-m-d',$browser['stableUpdate'])?>)</h6 -->

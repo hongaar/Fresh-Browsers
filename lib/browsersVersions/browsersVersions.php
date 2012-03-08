@@ -8,10 +8,8 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-07
+ * Date: 2012-03-08
  *
- * TODO:
- * предусмотреть возможность сохранения нескольких стабильных и нестабильных версий (м.б. какие-то теги)
  *
  */
  
@@ -20,11 +18,13 @@ class browsersVersions {
 
 	public $links = 'links.php';
 	
-	public $updateTimeOut = 0; // как часто проверять версию браузера
+	public $updateTimeOut = 3600; // как часто проверять версию браузера
 	
 	public $banTimeOut = 86400; // банить версию на сутки
 	
 	public $checkTimeOut = 86400; // время до повторной отправки письма с проверкой версии
+	
+	public $autoApproveTimeOut = 172800; // approve version from check if it longer then this in check table
 	
 	public $lockTimeOut = 600; // 600
 	public $curl = false;
@@ -33,7 +33,7 @@ class browsersVersions {
 	public $db = null;
 	
 	public $approveLink = 'http://www.elfimov.ru/browsers/approve';
-	public $approveEmail = 'elfimov@gmail.com';
+	public $approveEmail = 'browsers@elfimov.ru';
 	
 	public $branches = array(
 		1	=>	'Stable',
@@ -44,12 +44,12 @@ class browsersVersions {
 	
 	public $versions = null;
 	public $browsers = null;
+	public $wikiLinks = null;
 	
 	public $errors = array();
 
 	public function __construct($db=null) {
 		$this->dir = dirname(__FILE__);
-		$this->wikiLinks = include($this->dir.'/'.$this->links);
 		if (isset($db)) {
 			$this->db = $db;
 		}
@@ -69,6 +69,13 @@ class browsersVersions {
 	
 	public function getBranches() {
 		return $this->branches;
+	}
+	
+	public function getWikiLinks() {
+		if (!isset($this->wikiLinks)) {
+			$this->wikiLinks = include($this->dir.'/'.$this->links);
+		}
+		return $this->wikiLinks;
 	}
 	
 	
@@ -143,12 +150,18 @@ class browsersVersions {
 	
 	
 	public function deleteFromCheck($version) {
-		return $this->db->prepare('DELETE FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate')
+		if (is_array($version)) {
+			return $this->db->prepare('DELETE FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate')
 							->bind(':browserId', $version['browserId'])
 							->bind(':branchId', $version['branchId'])
 							->bind(':releaseVersion', $version['releaseVersion'])
 							->bind(':releaseDate', $version['releaseDate'])
 							->execute();
+		} else {
+			return $this->db->prepare('DELETE FROM `check` WHERE id=:id')
+							->bind(':id', $version)
+							->execute();
+		}
 	}
 	
 	
@@ -169,7 +182,7 @@ class browsersVersions {
 		}
 		
 		// delete same version from check
-		$this->deleteFromCheck($version);
+		$this->deleteFromCheck($version['id']);
 		
 		return $version;
 	}
@@ -187,7 +200,7 @@ class browsersVersions {
 		$this->addToBan($version);
 		
 		// delete same version from check
-		$this->deleteFromCheck($version);
+		$this->deleteFromCheck($version['id']);
 		
 		return $version;
 	}
@@ -229,6 +242,18 @@ class browsersVersions {
 	}
 	
 	
+	public function autoApproveCheck() {
+		$result = $this->db->prepare('SELECT * FROM `check` WHERE __modified<:modified')
+							->bind(':modified', time()-$this->autoApproveTimeOut)
+							->execute();
+		while ($version = $result->fetch()) {
+			if ($this->addVersion($version)) {
+				$this->deleteFromCheck($version['id']);
+			}
+		}
+	}
+	
+	
 	public function addVersion($version) {
 	
 		return $this->db->prepare('INSERT INTO `history` (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
@@ -260,6 +285,8 @@ class browsersVersions {
 		$updated = array();
 		
 		$this->setLock();
+		
+		$this->autoApproveCheck();
 		
 		$versions = $this->getVersions();
 
@@ -317,6 +344,7 @@ class browsersVersions {
 	
 		$browsers = $this->getBrowsers();
 		$branches = $this->getBranches();
+		$wikiLinks = $this->getWikiLinks();
 	
 		$browserName = strtolower($browsers[$browserId]['shortName']);
 		$browserBranch = $branches[$branchId];
@@ -324,7 +352,7 @@ class browsersVersions {
 		$versions = false;
 		$text = $this->getWikiText($browserName, $browserBranch);
 		if ($text!==false) {
-			$regexp = $this->wikiLinks[$browserName]['regexp'];
+			$regexp = $wikiLinks[$browserName]['regexp'];
 			preg_match_all($regexp['version'], $text, $ver);
 			preg_match_all($regexp['date'], $text, $date);
 			if (isset($ver[1]) && !empty($ver[1])) {
@@ -351,9 +379,10 @@ class browsersVersions {
 	
 	public function getWikiText($browserName, $branchName) {
 		if ($this->curl) {
+			$wikiLinks = $this->getWikiLinks();
 			$ch = curl_init();
 			$options = array(
-				CURLOPT_URL				=>	$this->wikiLinks[$browserName][$branchName],
+				CURLOPT_URL				=>	$wikiLinks[$browserName][$branchName],
 				CURLOPT_RETURNTRANSFER	=>	true,
 				CURLOPT_FOLLOWLOCATION	=>	true,
 				CURLOPT_MAXREDIRS		=>	10,
@@ -378,8 +407,9 @@ class browsersVersions {
 	
 	public function createSh() {
 		$branches = $this->getBranches();
+		$wikiLinks = $this->getWikiLinks();
 		$out = '#!/bin/sh'."\n";
-		foreach ($this->wikiLinks as $browserName=>$branch) {
+		foreach ($wikiLinks as $browserName=>$branch) {
 			foreach ($branch as $branchName=>$link) {
 				if (in_array($branchName, $branches)) {
 					$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
