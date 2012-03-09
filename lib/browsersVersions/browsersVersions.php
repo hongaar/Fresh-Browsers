@@ -33,7 +33,8 @@ class browsersVersions {
 	public $db = null;
 	
 	public $approveLink = 'http://www.elfimov.ru/browsers/approve';
-	public $approveEmail = 'browsers@elfimov.ru';
+	public $approveEmailFrom = 'browsers@elfimov.ru';
+	public $approveEmailTo = 'elfimov@gmail.com';
 	
 	public $branches = array(
 		1	=>	'Stable',
@@ -134,10 +135,10 @@ class browsersVersions {
 					. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
 					. 'Delete: '.$this->approveLink.'/no/'.$code . "\n";
 		
-		$headers = 'From: Fresh Browsers <' . $this->approveEmail . '>' . "\n" 
-					. 'Reply-To: ' . $this->approveEmail . "\n";
+		$headers = 'From: Fresh Browsers <' . $this->approveEmailFrom . '>' . "\n" 
+					. 'Reply-To: ' . $this->approveEmailFrom . "\n";
 			
-		$result = mail($this->approveEmail, $subject, $message, $headers);
+		$result = mail($this->approveEmailTo, $subject, $message, $headers);
 		
 		if ($result===false) {
 			$this->errors[] = 'newVersions error: can\'t send email';
@@ -258,7 +259,7 @@ class browsersVersions {
 	
 		return $this->db->prepare('INSERT INTO `history` (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
 			->bind(':browserId', $version['browserId'])
-			->bind(':branchId', $version['browserId'])
+			->bind(':branchId', $version['branchId'])
 			->bind(':releaseVersion', $version['releaseVersion'])
 			->bind(':releaseDate', $version['releaseDate'])
 			->bind(':modified', time())
@@ -301,6 +302,7 @@ class browsersVersions {
 
 		foreach ($updateBrowsers as $browser) {
 			$new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
+
 			if ($new!==false) {
 				$current = $versions[$browser['browserId']][$browser['branchId']];
 				if (isset($new['releaseDate'])  && isset($new['releaseVersion'])
@@ -347,7 +349,7 @@ class browsersVersions {
 		$wikiLinks = $this->getWikiLinks();
 	
 		$browserName = strtolower($browsers[$browserId]['shortName']);
-		$browserBranch = $branches[$branchId];
+		$browserBranch = strtolower($branches[$branchId]);
 	
 		$versions = false;
 		$text = $this->getWikiText($browserName, $browserBranch);
