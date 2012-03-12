@@ -318,7 +318,7 @@ class browsersVersions {
 		}
 		
 		// forced versions update
-		$this->lib->browsersVersions->getVersions(true);
+		$this->getVersions(true);
 		
 		$this->removeLock();
 		
