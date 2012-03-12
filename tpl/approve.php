@@ -9,6 +9,7 @@ if (isset($this->variables[1])) {
 			echo implode('<br>', $this->lib->browsersVersions->errors);
 		} else {
 			echo 'APPROVED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date('Y-m-d',$browser['releaseDate']);
+			$this->template('makeexport.tpl');
 		}
 	} else 
 	if ($this->variables[0]=='no') {
@@ -18,6 +19,10 @@ if (isset($this->variables[1])) {
 		} else {
 			echo 'DELETED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date('Y-m-d',$browser['releaseDate']);
 		}
-	} 
+	}
 }
+
+
+
+
 
