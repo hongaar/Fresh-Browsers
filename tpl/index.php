@@ -21,12 +21,12 @@ $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName L
 <blockquote>
 <h4>Export</h4>
 <ul class="unstyled">
-	<li><a href="http://www.elfimov.ru/browsers/export/browsers.xml">XML</a></li>
-	<li><a href="http://www.elfimov.ru/browsers/export/browsers.yaml">YAML</a></li>
-	<li><a href="http://www.elfimov.ru/browsers/export/browsers.json">JSON</a></li>
-	<li><a href="http://www.elfimov.ru/browsers/export/browsers.serialized">PHP serialized</a></li>
-	<li><a href="http://www.elfimov.ru/browsers/export/browsers.html">HTML</a></li>
-	<li><a href="http://www.elfimov.ru/browsers/rss">RSS</a></li>
+	<li><a href="<?=$this->link('/export/browsers.xml')?>">XML</a></li>
+	<li><a href="<?=$this->link('/export/browsers.yaml')?>">YAML</a></li>
+	<li><a href="<?=$this->link('/export/browsers.json')?>">JSON</a></li>
+	<li><a href="<?=$this->link('/export/browsers.serialized')?>">PHP serialized</a></li>
+	<li><a href="<?=$this->link('/export/browsers.html')?>">HTML</a></li>
+	<li><a href="<?=$this->link('/rss')?>">RSS</a></li>
 </ul>
 </blockquote>
 

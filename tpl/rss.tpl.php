@@ -6,7 +6,7 @@ header('Content-Type: text/xml; charset=utf-8');
 <channel>
 <title>Fresh Browsers</title>
 <link>http://elfimov.ru/browsers/</link>
-<atom:link href="http://elfimov.ru/browsers/rss/" rel="self" type="application/rss+xml" />
+<atom:link href="<?=$this->link('/rss/', true);?>" rel="self" type="application/rss+xml" />
 <description>Latest versions of major web browsers</description>
 <docs>http://blogs.law.harvard.edu/tech/rss</docs>
 <webMaster>dmitry@elfimov.ru (Dmitry Elfimov)</webMaster>

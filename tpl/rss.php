@@ -10,7 +10,7 @@ $historyArr = $this->lib->db->prepare('SELECT * FROM history ORDER BY releaseDat
 						->fetchAll();
 
 foreach ($historyArr as $obj) {
-$link = 'http://elfimov.ru/browsers/history/'.$obj['id'];
+$link = $this->link('/history/'.$obj['id'], true);
 ?>
 <item>
 <title><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.$branches[$obj['branchId']].')'?></title>
