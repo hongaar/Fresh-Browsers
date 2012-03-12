@@ -80,8 +80,8 @@ class core {
 		return ob_get_clean();
 	}
 	
-	public function link ($link) {
-		return $this->subDir.((isset($link{0}) && $link{0}!='/')?'/':'').$link;
+	public function link ($link, $full=false) {
+		return ($full?'http://'.$_SERVER['HTTP_HOST']:'').$this->subDir.((isset($link{0}) && $link{0}!='/')?'/':'').$link;
 	}
 	
 }
