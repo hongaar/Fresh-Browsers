@@ -7,8 +7,6 @@
 
 $this->mainTemplate = 'empty.tpl';
 
-
-	
 $updated = $this->lib->browsersVersions->updateVersions();
 
 if ($updated===false) {
@@ -16,6 +14,7 @@ if ($updated===false) {
 } else 
 if (!empty($updated)) {
 	echo implode('<br>', $updated);
+	$this->template('makeexport.tpl'); // force export for autoApproveCheck
 } else {
 	echo 'nothing to do';
 }

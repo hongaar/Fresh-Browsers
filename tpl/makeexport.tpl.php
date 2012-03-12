@@ -1,7 +1,7 @@
 <?php
 
-$this->mainTemplate = 'empty.tpl';
 
+// export new versions to html
 $exportPath = $this->dir.'/export';
 
 $versions = $this->lib->browsersVersions->getVersions();
@@ -33,26 +33,28 @@ file_put_contents($exportPath.'/browsers.json', json_encode($export));
 
 file_put_contents($exportPath.'/browsers.serialized', serialize($export));
 
-$xml = new SimpleXMLElement('<browsers/>');
-arrayToXML($export, $xml);
-file_put_contents($exportPath.'/browsers.xml', $xml->asXML());
+file_put_contents($exportPath.'/browsers.xml', arrayToXML($export, '<browsers/>')->asXML());
 
 file_put_contents($exportPath.'/browsers.yaml', $this->lib->sfYaml->dump($export));
 
 file_put_contents($exportPath.'/browsers.html', $this->template('browsers.tpl', array('browsers'=>$export)));
 
 
-function arrayToXML($array, &$xml) {
-	foreach($array as $key => $value) {
-		if(is_array($value)) {
+function arrayToXML($array, $xml) {
+	if (!is_object($xml)) {
+		$xml = new SimpleXMLElement($xml);
+	}
+	foreach ($array as $key => $value) {
+		if (is_array($value)) {
 			if (!is_numeric($key)) {
 				$subnode = $xml->addChild($key);
-				arrayToXML($value, $subnode);
+				$subnode = arrayToXML($value, $subnode);
 			} else {
-				arrayToXML($value, $xml);
+				$xml = arrayToXML($value, $xml);
 			}
 		} else {
 			$xml->addChild($key, $value);
 		}
 	}
+	return $xml;
 }

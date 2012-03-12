@@ -4,11 +4,11 @@
  * 
  * http:/www.elfimov.ru/browsers
  *
- * Copyright (c) 2011 by Dmitry Elfimov
+ * Copyright (c) 2012 by Dmitry Elfimov
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-08
+ * Date: 2012-03-12
  *
  *
  */
@@ -80,8 +80,8 @@ class browsersVersions {
 	}
 	
 	
-	public function getVersions() {
-		if (!isset($this->versions)) {
+	public function getVersions($force = false) {
+		if (!isset($this->versions) || $force) {
 			$this->versions = array();
 			$result = $this->db->prepare('SELECT * FROM `history` GROUP BY branchId, browserId ORDER BY releaseDate DESC')
 								->execute();
@@ -317,6 +317,9 @@ class browsersVersions {
 			}
 		}
 		
+		// forced versions update
+		$this->lib->browsersVersions->getVersions(true);
+		
 		$this->removeLock();
 		
 		return $updated;
@@ -420,6 +423,6 @@ class browsersVersions {
 		}
 		return file_put_contents($this->dir.'/curl_links_files.sh', $out);		
 	}
-
+	
 	 
 }
