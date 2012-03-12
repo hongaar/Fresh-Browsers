@@ -1,9 +1,3 @@
 
-export/browsers-full.html
-export/browsers-short.html
-export/browsers.json
-export/browsers.serialized
-export/browsers.xml
-export/browsers.yaml
 /favicon.ico
 /versions/browsers.sqlite.bak
