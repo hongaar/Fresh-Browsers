@@ -12,6 +12,7 @@ $export = array();
 
 foreach ($browsers as $browserId => $browser) {			// all browsers
 	foreach ($branches as $branchId=>$branchName) {		// all branches
+		$branchName = ucfirst($branchName);
 		if (isset($versions[$browserId][$branchId])) {	// check if we have version for this browser-branch
 			$browserName = strtolower($browser['shortName']);
 			if (!isset($export[$browserName])) {				// create export array if this browser is not in it yet 

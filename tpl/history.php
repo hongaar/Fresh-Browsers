@@ -15,7 +15,7 @@ if (isset($this->variables[0])) {
 		$browsers = $this->lib->browsersVersions->getBrowsers();
 
 		?>
-		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.$branches[$obj['branchId']].')'?></h1>
+		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.ucfirst($branches[$obj['branchId']]).')'?></h1>
 		<p>Released: <?=date('Y-m-d', $obj['releaseDate'])?></p>
 		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
 		<br>
