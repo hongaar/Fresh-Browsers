@@ -7,6 +7,8 @@
 
 $this->mainTemplate = 'empty.tpl';
 
+// set true if you want to approve new versions
+$this->lib->browsersVersions->doNotApprove = true;
 // change these emails to correct ones
 $this->lib->browsersVersions->approveEmailFrom = 'browsers@elfimov.ru';
 $this->lib->browsersVersions->approveEmailTo = 'elfimov@gmail.com';
@@ -20,7 +22,7 @@ if ($updated===false) {
 } else 
 if (!empty($updated)) {
 	echo implode('<br>', $updated);
-	$this->template('makeexport.tpl'); // force export for autoApproveCheck
+	$this->template('makeexport.tpl'); // force export for autoApproveCheck() & doNotCheck=true
 } else {
 	echo 'nothing to do';
 }

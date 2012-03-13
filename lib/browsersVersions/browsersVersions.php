@@ -28,10 +28,12 @@ class browsersVersions {
 	
 	public $lockTimeOut = 600; // 600
 	public $curl = false;
+	public $createShTool = 'curl';
 	
 	public $userAgent = 'Mozilla/4.0 (compatible; fresh-browsers.com bot)';
 	public $db = null;
 	
+	public $doNotApprove = true;			// set this to true if you do not want to approve new versions by email
 	public $approveLink = '';
 	public $approveEmailFrom = '';
 	public $approveEmailTo = '';
@@ -104,6 +106,16 @@ class browsersVersions {
 					
 		$browsers = $this->getBrowsers();
 		$branches = $this->getBranches();
+		
+		if ($this->doNotApprove) {
+			$this->addVersion(array(
+				'browserId'			=> $browserId,
+				'branchId'			=> $branchId,
+				'releaseVersion'	=> $new['releaseVersion'],
+				'releaseDate'		=> $new['releaseDate']
+			));
+			return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+		}
 		
 		if ($this->isBanned($new)) {
 			return 'BANNED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
@@ -291,6 +303,24 @@ class browsersVersions {
 		$this->autoApproveCheck();
 		
 		$versions = $this->getVersions();
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
+		
+		$wikiLinks = $this->getWikiLinks();
+		foreach ($browsers as $browserId => $browser) {
+			$browserName = strtolower($browser['shortName']);
+			foreach ($wikiLinks[$browserName] as $branchName=>$link) {
+				$branchId = array_search($branchName, $branches);
+				if ($branchId!==false && !isset($versions[$browserId][$branchId])) {
+					$versions[$browserId][$branchId] = array(
+										'releaseVersion'	=> 0,
+										'releaseDate'		=> 0,
+										'__modified'		=> 0,
+										'__id'				=> 0,
+									);
+				}
+			}
+		}
 
 		foreach ($versions as $browserId=>$branch) {
 			foreach ($branch as $branchId=>$values) {
@@ -300,10 +330,8 @@ class browsersVersions {
 			}
 		}
 		
-
 		foreach ($updateBrowsers as $browser) {
 			$new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
-
 			if ($new!==false) {
 				$current = $versions[$browser['browserId']][$browser['branchId']];
 				if (isset($new['releaseDate'])  && isset($new['releaseVersion'])
@@ -418,7 +446,11 @@ class browsersVersions {
 		foreach ($wikiLinks as $browserName=>$branch) {
 			foreach ($branch as $branchName=>$link) {
 				if (in_array($branchName, $branches)) {
-					$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
+					if ($this->createShTool=='curl') {
+						$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
+					} else {
+						$out .= 'wget "'.$link.'" -O '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
+					}
 				}
 			}
 		}
