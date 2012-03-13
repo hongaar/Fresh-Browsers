@@ -8,7 +8,7 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-12
+ * Date: 2012-03-13
  *
  *
  */
@@ -29,12 +29,12 @@ class browsersVersions {
 	public $lockTimeOut = 600; // 600
 	public $curl = false;
 	
-	public $userAgent = 'Mozilla/4.0 (compatible; Fresh Browsers bot)';
+	public $userAgent = 'Mozilla/4.0 (compatible; fresh-browsers.com bot)';
 	public $db = null;
 	
-	public $approveLink = 'http://www.elfimov.ru/browsers/approve';
-	public $approveEmailFrom = 'browsers@elfimov.ru';
-	public $approveEmailTo = 'elfimov@gmail.com';
+	public $approveLink = '';
+	public $approveEmailFrom = '';
+	public $approveEmailTo = '';
 	
 	public $branches = array(
 		1	=>	'Stable',
@@ -128,17 +128,18 @@ class browsersVersions {
 			return false;
 		}
 		
-		$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
-		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
-					. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
-					. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
-					. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
-					. 'Delete: '.$this->approveLink.'/no/'.$code . "\n";
-		
-		$headers = 'From: Fresh Browsers <' . $this->approveEmailFrom . '>' . "\n" 
-					. 'Reply-To: ' . $this->approveEmailFrom . "\n";
+		if ($this->approveEmailTo!='' && $this->approveEmailFrom!='') {
+			$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
+			$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
+						. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
+						. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
+						. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
+						. 'Delete: '.$this->approveLink.'/no/'.$code . "\n";
 			
-		$result = mail($this->approveEmailTo, $subject, $message, $headers);
+			$headers = 'From: Fresh Browsers <' . $this->approveEmailFrom . '>' . "\n" 
+						. 'Reply-To: ' . $this->approveEmailFrom . "\n";
+			$result = mail($this->approveEmailTo, $subject, $message, $headers);
+		}
 		
 		if ($result===false) {
 			$this->errors[] = 'newVersions error: can\'t send email';

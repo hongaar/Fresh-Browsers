@@ -8,7 +8,9 @@ Latest versions & history of major web browsers
 Installation
 ------------
 * Copy project directory to you webserver
-* Check some configs in lib/browsersVersions/browsersVersions.php
+* Fill correct email adresses in tpl/update.php
+* Create curl_links_files.sh with /createsh link
+* Add curl_links_files.sh and /update to webserver crontab
 
 
 Todo

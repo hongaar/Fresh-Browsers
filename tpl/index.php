@@ -10,7 +10,7 @@ $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName L
 
 <?php
 	if (file_exists($this->dir.'/export/browsers.html')) {
-		include($this->dir.'/export/browsers.html');
+		echo file_get_contents($this->dir.'/export/browsers.html');
 	} else {
 		echo $this->template('browsers.tpl', array('browsers'=>$browsers));
 	}
