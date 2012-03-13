@@ -44,7 +44,7 @@
 <script type="text/javascript">
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-29600575-1']);
-_gaq.push(['_setDomainName', 'elfimov.ru']);
+_gaq.push(['_setDomainName', 'fresh-browsers.com']);
 _gaq.push(['_trackPageview']);
 (function() {
 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
