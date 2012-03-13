@@ -37,10 +37,10 @@ class browsersVersions {
 	public $approveEmailTo = '';
 	
 	public $branches = array(
-		1	=>	'Stable',
-		2	=>	'LTS',
-		3	=>	'Preview',
-		4	=>	'Dev',
+		1	=>	'stable',
+		2	=>	'lts',
+		3	=>	'preview',
+		4	=>	'dev',
 	);
 	
 	public $versions = null;
@@ -353,7 +353,7 @@ class browsersVersions {
 		$wikiLinks = $this->getWikiLinks();
 	
 		$browserName = strtolower($browsers[$browserId]['shortName']);
-		$browserBranch = strtolower($branches[$branchId]);
+		$browserBranch = $branches[$branchId];
 	
 		$versions = false;
 		$text = $this->getWikiText($browserName, $browserBranch);
