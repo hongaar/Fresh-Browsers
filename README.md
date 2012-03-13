@@ -2,7 +2,7 @@ Fresh Browsers
 ==============
 Latest versions & history of major web browsers
 
-[elfimov.ru/browsers](http://elfimov.ru/browsers/)
+[fresh-browsers.com](http://fresh-browsers.com/)
 
 
 Installation
