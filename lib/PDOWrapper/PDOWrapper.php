@@ -52,7 +52,7 @@ class PDOWrapper {
 	
     public function __construct($pdo) {
         $this->handler = $pdo;
-		include_once(__DIR__.'/PDOWrapperStatement.php');
+		include_once(dirname(__FILE__).'/PDOWrapperStatement.php');
     }
 	
 
