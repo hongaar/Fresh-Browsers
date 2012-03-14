@@ -28,7 +28,7 @@ class browsersVersions {
 	
 	public $lockTimeOut = 600; // 600
 	public $curl = false;
-	public $createShTool = 'curl';
+	public $createShTool = 'curl'; // other option is wget
 	
 	public $userAgent = 'Mozilla/4.0 (compatible; fresh-browsers.com bot)';
 	public $db = null;
