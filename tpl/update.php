@@ -13,7 +13,7 @@ $this->lib->browsersVersions->doNotApprove = true;
 $this->lib->browsersVersions->approveEmailFrom = 'browsers@elfimov.ru';
 $this->lib->browsersVersions->approveEmailTo = 'elfimov@gmail.com';
 
-$this->lib->browsersVersions->approveLink = $this->link('/browsers/approve', true);
+$this->lib->browsersVersions->approveLink = $this->link('/approve', true);
 
 $updated = $this->lib->browsersVersions->updateVersions();
 
