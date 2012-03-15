@@ -1,5 +1,6 @@
 <?php
 
+$t = $this->lib->t;
 
 // export new versions to html
 $exportPath = $this->dir.'/export';
@@ -19,12 +20,12 @@ foreach ($browsers as $browserId => $browser) {			// all browsers
 				$export[$browserName] = array(	
 					'name'			=> $browser['name'],
 					'link'			=> $browser['link'],
-					'lastUpdate'	=> date('Y-m-d H:i:s', time()),
+					'lastUpdate'	=> date($t->t('Y-m-d H:i:s'), time()),
 				);
 			}
 			$export[$browserName][$branchName] = array(
 				'releaseVersion'=>	$versions[$browserId][$branchId]['releaseVersion'],
-				'releaseDate'	=>	date('Y-m-d', $versions[$browserId][$branchId]['releaseDate']),
+				'releaseDate'	=>	date($t->t('Y-m-d'), $versions[$browserId][$branchId]['releaseDate']),
 			);
 		}
 	}

@@ -8,7 +8,7 @@
 $this->mainTemplate = 'empty.tpl';
 
 // set true if you want to approve new versions
-$this->lib->browsersVersions->doNotApprove = true;
+$this->lib->browsersVersions->doNotApprove = false;
 // change these emails to correct ones
 $this->lib->browsersVersions->approveEmailFrom = 'browsers@elfimov.ru';
 $this->lib->browsersVersions->approveEmailTo = 'elfimov@gmail.com';

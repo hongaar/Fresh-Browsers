@@ -1,0 +1,1 @@
+<?phpreturn array(	'Y-m-d'			=>		'd.m.Y',	'Y-m-d H:i:s'	=>		'd.m.Y H:i:s');
