@@ -20,7 +20,6 @@ $browsers = $this->lib->browsersVersions->getBrowsers();
 $branches = $this->lib->browsersVersions->getBranches();
 
 $export = array();
-$t = $this->lib->t;
 foreach ($browsers as $browserId => $browser) {			// all browsers
 	foreach ($branches as $branchId=>$branchName) {		// all branches
 		$branchName = ucfirst($branchName);
@@ -30,12 +29,12 @@ foreach ($browsers as $browserId => $browser) {			// all browsers
 				$export[$browserName] = array(	
 					'name'			=> $browser['name'],
 					'link'			=> $browser['link'],
-					'lastUpdate'	=> date($t->t('Y-m-d H:i:s'), time()),
+					'lastUpdate'	=> date($this->lib->t('Y-m-d H:i:s'), time()),
 				);
 			}
 			$export[$browserName][$branchName] = array(
 				'releaseVersion'=>	$versions[$browserId][$branchId]['releaseVersion'],
-				'releaseDate'	=>	date($t->t('Y-m-d'), $versions[$browserId][$branchId]['releaseDate']),
+				'releaseDate'	=>	date($this->lib->t('Y-m-d'), $versions[$browserId][$branchId]['releaseDate']),
 			);
 		}
 	}
