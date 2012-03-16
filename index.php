@@ -19,6 +19,10 @@ $core->libs = array(
 						'db'	=>	array('PDOWrapper', '@pdo'),
 						'browsersVersions'	=>	array('browsersVersions', '@db'),
 					);
+$core->libsDefaultMethods = array(
+					'user'	=>	'get',
+					't'		=>	't',
+					);
 echo $core->render();
 
 

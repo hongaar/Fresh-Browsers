@@ -10,31 +10,39 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-02-07
+ * Date: 2012-03-16
  *
  * Example:
  include($__dir.'/lib/lib.php');
- $lib = new lib(array(
-				't'		=>	array('translate'),
-				'pdo'	=>	array('PDO', 'sqlite:'.$__dir.'/versions/browsers.sqlite'),
-				'db'	=>	array('PDOWrapper', '@pdo'),
-			));
+ $lib = new lib(
+				array(
+					'translate'		=>	array('translate'),
+					'pdo'			=>	array('PDO', 'sqlite:'.$__dir.'/versions/browsers.sqlite'),
+					'db'			=>	array('PDOWrapper', '@pdo'),
+				),
+				array(
+					'translate'		=>	't', // t() is default method for class translate
+				)
+			);
  $lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 10')
 						->execute()
 						->fetchAll();
-	
+						
+ echo $lib->translate('string');
  */
 
 class lib {
 
 	private $libCollection = array();
 	private $libs = array();
+	private $libsDefaultMethods = array();
 	private $dir = null;
 
 	
-	public function __construct($libs) {
+	public function __construct($libs, $libsDefaultMethods) {
 		$this->dir = dirname(__FILE__);
 		$this->libs = $libs;
+		$this->libsDefaultMethods = $libsDefaultMethods;
 	}
 
 	
@@ -48,15 +56,15 @@ class lib {
 			$p = array();
 			$class = $className;
 		} else {
-			return false; // êëàññ íå áûë íàéäåí
+			return false; // ĞºĞ»Ğ°ÑÑ Ğ½Ğµ Ğ±Ñ‹Ğ» Ğ½Ğ°Ğ¹Ğ´ĞµĞ½
 		}
 	
-		if (!class_exists($class, false)) { // íå âñòğîåííûé êëàññ
+		if (!class_exists($class, false)) { // Ğ½Ğµ Ğ²ÑÑ‚Ñ€Ğ¾ĞµĞ½Ğ½Ñ‹Ğ¹ ĞºĞ»Ğ°ÑÑ
 			include_once($this->dir.'/'.$class.'/'.$class.'.php');
 		}
 	
 		foreach ($p as &$par) {
-			if ($par{0} == '@') { // èìÿ ïàğàìåòğà íà÷èíàåòñÿ ñ @ - çíà÷èò ıòî êàêîé-òî êëàññ, îïèñàííûé ïğè âûçîâå êîíñòğóêòîğà
+			if ($par{0} == '@') { // Ğ¸Ğ¼Ñ Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ğ° Ğ½Ğ°Ñ‡Ğ¸Ğ½Ğ°ĞµÑ‚ÑÑ Ñ @ - Ğ·Ğ½Ğ°Ñ‡Ğ¸Ñ‚ ÑÑ‚Ğ¾ ĞºĞ°ĞºĞ¾Ğ¹-Ñ‚Ğ¾ ĞºĞ»Ğ°ÑÑ, Ğ¾Ğ¿Ğ¸ÑĞ°Ğ½Ğ½Ñ‹Ğ¹ Ğ¿Ñ€Ğ¸ Ğ²Ñ‹Ğ·Ğ¾Ğ²Ğµ ĞºĞ¾Ğ½ÑÑ‚Ñ€ÑƒĞºÑ‚Ğ¾Ñ€Ğ°
 				$self = substr($par, 1);
 				if ($self!=$className) { // antiloop
 					$newPar = $this->__get($self);
@@ -71,7 +79,7 @@ class lib {
 		$reflectionClass = new \ReflectionClass($class);
 		return $reflectionClass->newInstanceArgs($p);
 		*/
-		// êîä âûøå êğàñèâåå, ìåíüøå è íå èìååò îãğàíè÷åíèÿ íà 10 ïàğàìåòğîâ, íî ğàáîòàåò ïğèìåğíî íà 50% ìåäëåííåé (php 5.3) 
+		// ĞºĞ¾Ğ´ Ğ²Ñ‹ÑˆĞµ ĞºÑ€Ğ°ÑĞ¸Ğ²ĞµĞµ, Ğ¼ĞµĞ½ÑŒÑˆĞµ Ğ¸ Ğ½Ğµ Ğ¸Ğ¼ĞµĞµÑ‚ Ğ¾Ğ³Ñ€Ğ°Ğ½Ğ¸Ñ‡ĞµĞ½Ğ¸Ñ Ğ½Ğ° 10 Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ğ¾Ğ², Ğ½Ğ¾ Ñ€Ğ°Ğ±Ğ¾Ñ‚Ğ°ĞµÑ‚ Ğ¿Ñ€Ğ¸Ğ¼ĞµÑ€Ğ½Ğ¾ Ğ½Ğ° 50% Ğ¼ĞµĞ´Ğ»ĞµĞ½Ğ½ĞµĞ¹ (php 5.3) 
 		switch (count($p)) {	
 			case 0: $c = new $class(); break;
 			case 1: $c = new $class($p[0]); break;
@@ -96,5 +104,35 @@ class lib {
 			$this->libCollection[$name] = $this->getClass($name);
 		}
 		return $this->libCollection[$name];
+	}
+	
+	
+	public function __call($name, $p) {
+		$class = $this->__get($name);
+		if (isset($this->libsDefaultMethods[$name])) {
+			// this is slower then switch .. case
+			// return call_user_func_array(array($class, $this->libsDefaultMethods[$name]), $p);
+			$method = $this->libsDefaultMethods[$name];
+			switch (count($p)) {
+				case 1: $r = $class->$method($p[0]); break;
+				case 2: $r = $class->$method($p[0], $p[1]); break;
+				case 3: $r = $class->$method($p[0], $p[1], $p[2]); break;
+				case 4: $r = $class->$method($p[0], $p[1], $p[2], $p[3]); break;
+				case 5: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4]); break;
+				case 6: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4], $p[5]); break;
+				case 7: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6]); break;
+				case 8: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6], $p[7]); break;
+				case 9: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6], $p[7], $p[8]); break;
+				case 10: $r = $class->$method($p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6], $p[7], $p[8], $p[9]); break;
+				case 0:
+				default: $r = $class->$method(); break;
+			}
+			return $r;
+		} else 
+		if (defined('PHP_VERSION_ID') && PHP_VERSION_ID>=50300) {	// __invoke for php>5.3
+			return call_user_func_array($class, $p);
+		} else {
+			return false;
+		}
 	}
 }

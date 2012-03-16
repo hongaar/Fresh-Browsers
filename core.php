@@ -7,7 +7,7 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-02-10
+ * Date: 2012-03-15
  */
  
 class core {
@@ -21,6 +21,7 @@ class core {
 	public $template = '';
 	public $lib = null;
 	public $libs = array();
+	public $libsDefaultMethods = array();
 	
 	public $requestURI = null;
 	
@@ -31,9 +32,6 @@ class core {
 	
 	public function render() {
 		$this->controller();
-//		print_r($_SERVER);
-//		print_r($this->action);
-//		print_r($this->variables);
 		$this->model();
 		return $this->view();
 	}
@@ -57,7 +55,7 @@ class core {
 	
 	public function model() {
 		include($this->dir.'/lib/lib.php');
-		$this->lib = new lib($this->libs);
+		$this->lib = new lib($this->libs, $this->libsDefaultMethods);
 	}	
 	
 	public function view() {
