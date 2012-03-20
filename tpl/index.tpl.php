@@ -18,8 +18,8 @@
 	<div class="container">
 	
 	<div class="hero-unit">
-		<h1>Fresh Browsers</h1>
-		<p>Latest versions of major web browsers.</p>
+		<h2>Fresh Browsers</h2>
+		<h1>Latest versions of major web browsers.</h1>
 	</div>
 	
 	<ul class="nav nav-tabs">
