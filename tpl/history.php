@@ -46,7 +46,7 @@ while ($browser = $result->fetch()) {
 	$history[$browser['browserId']][$browser['branchId']][] = $browser;
 }
 ?>
-
+<div class="history">
 <div class="row">
 
 <?php
@@ -56,29 +56,18 @@ $shortName = strtolower($browser['shortName']);
 <div class="span2 browsers">
 	<div class="browser" id="browser-<?=$shortName?>"><a href="<?=$browser['link']?>"></a></div>
 	<h4><a href="<?=$browser['link']?>"><?=$browser['name']?></a></h4>
-	<br>
 	<?php
 	if (isset($history[$browser['id']][$branchId])) {
 		foreach ($history[$browser['id']][$branchId] as $historyObj) {
-			$version = explode('.', $historyObj['releaseVersion']);
-			if (!isset($versionPrev) || $versionPrev[0]!=$version[0]) {
-				echo isset($versionPrev) ? '</div>' : '';
-				?>
-				<div class="browser-block" id="browser-<?=$branches[$branchId].'-'.$shortName.'-'.$version[0]?>">
-				<div class="browser-title"><a href="#" title="<?=$browser['name'].' '.$historyObj['releaseVersion']?>"><?=$version[0].'.'.$version[1]?> <span class="date"><?=date($this->lib->t('Y-m-d'), $historyObj['releaseDate'])?></span></a></div>
-				<?php
-			}
 			?>
-			<div class="browser-version"><a href="<?=$this->link('/history/'.$historyObj['id'])?>" title="<?=$browser['name'].' '.$historyObj['releaseVersion']?>"><?=$historyObj['releaseVersion']?></a> <span class="date"><?=date($this->lib->t('Y-m-d'), $historyObj['releaseDate'])?></span><?=$this->edit?' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>':''?></div>
+			<div class="browser-version browser-<?=$branches[$branchId].'-'.$shortName.'-'.$version[0]?>"><a href="<?=$this->link('/history/'.$historyObj['id'])?>" title="<?=$browser['name'].' '.$historyObj['releaseVersion']?>"><?=$historyObj['releaseVersion']?></a> <span class="date"><?=date($this->lib->t('Y-m-d'), $historyObj['releaseDate'])?></span><?=$this->edit?' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>':''?></div>
 			<?php
-			$versionPrev = $version;
 		}
-		echo isset($versionPrev) ? '</div>' : '';
-		unset($versionPrev);
 	}
 	?>
 </div>
 <?php
 }
 ?>
+</div>
 </div>

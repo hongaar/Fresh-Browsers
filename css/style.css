@@ -61,19 +61,8 @@
 #browser-ie {
 	background-position:-166px 0;
 }
-.browser-version {
-	display:none;
-}
-.browser-title a {
-	text-decoration:none;
-
-}
-.browser-title a:hover {
-	border-bottom:1px dashed #0088CC;
-}
-.browser-block-active {
-	border:2px solid #ccc;
-	padding:10px;
+.history .browsers h4 {
+	margin-bottom:10px;
 }
 
 .browsers ul {

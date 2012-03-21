@@ -7,8 +7,6 @@
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<script type="text/javascript" src="<?=$this->link('/js/common.js')?>"></script>
 	<link href="<?=$this->link('/favicon.ico')?>" rel="shortcut icon">
     <link href="<?=$this->link('/css/bootstrap.min.css')?>" rel="stylesheet">
 	<link href="<?=$this->link('/css/style.css')?>" rel="stylesheet">
