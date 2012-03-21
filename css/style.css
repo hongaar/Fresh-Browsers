@@ -46,22 +46,35 @@
 	background:#f9f9f9;
 	padding:15px;
 }
-#browser_firefox {
+#browser-firefox {
 	background-position:-106px 0;
 }
-#browser_safari {
+#browser-safari {
 	background-position:-51px 0;
 }
-#browser_chrome {
+#browser-chrome {
 	background-position:0 0;
 }
-#browser_opera {
+#browser-opera {
 	background-position:-226px 0;
 }
-#browser_ie {
+#browser-ie {
 	background-position:-166px 0;
 }
+.browser-version {
+	display:none;
+}
+.browser-title a {
+	text-decoration:none;
 
+}
+.browser-title a:hover {
+	border-bottom:1px dashed #0088CC;
+}
+.browser-block-active {
+	border:2px solid #ccc;
+	padding:10px;
+}
 
 .browsers ul {
 }

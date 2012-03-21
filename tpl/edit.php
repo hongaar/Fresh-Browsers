@@ -41,7 +41,7 @@ if (isset($this->variables[0])) {
 	if ($historyObj!==false) {
 		$values = array(
 			'browser'	=>	$historyObj['browserId'],
-			'branch'	=>	$historyObj['branch'],
+			'branch'	=>	$historyObj['branchId'],
 			'version'	=>	$historyObj['releaseVersion'],
 			'date'		=>	date('Y-m-d', $historyObj['releaseDate']),
 			'note'		=>	$historyObj['note'],
@@ -82,13 +82,13 @@ if (isset($_POST) && !empty($_POST)) {
 	
 	if ($values['browser']!=-1 && $values['branch']!=-1) {
 		if ($historyId>0) {
-			$prepare = $this->lib->db->prepare('UPDATE history SET browserId=:browserId, branch=:branch, releaseVersion=:releaseVersion, releaseDate=:releaseDate, __modified=:modified WHERE id=:id');
+			$prepare = $this->lib->db->prepare('UPDATE history SET browserId=:browserId, branchId=:branchId, releaseVersion=:releaseVersion, releaseDate=:releaseDate, __modified=:modified WHERE id=:id');
 		} else {
 			$prepare = $this->lib->db->prepare('INSERT INTO history (browserId, branch, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branch, :releaseVersion, :releaseDate, :modified)');
 		}
 		$result = $prepare
 				->bind(':browserId', $values['browser'])
-				->bind(':branch', $values['branch'])
+				->bind(':branchId', $values['branch'])
 				->bind(':releaseVersion', $values['version'])
 				->bind(':releaseDate', $releaseTime)
 				->bind(':modified', time())
