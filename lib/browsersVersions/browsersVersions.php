@@ -38,6 +38,9 @@ class browsersVersions {
 	public $approveEmailFrom = '';
 	public $approveEmailTo = '';
 	
+	public $dateFormat = 'Y-m-d';
+	public $timeFormat = 'H:i:s';
+	
 	public $branches = array(
 		1	=>	'stable',
 		2	=>	'lts',
@@ -100,6 +103,38 @@ class browsersVersions {
 	}
 	
 
+	
+	public function getExport() {
+	
+		$versions = $this->getVersions();
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
+
+		$export = array();
+
+		foreach ($browsers as $browserId => $browser) {			// all browsers
+			foreach ($branches as $branchId=>$branchName) {		// all branches
+				$branchName = ucfirst($branchName);
+				if (isset($versions[$browserId][$branchId])) {	// check if we have version for this browser-branch
+					$browserName = strtolower($browser['shortName']);
+					if (!isset($export[$browserName])) {				// create export array if this browser is not in it yet 
+						$export[$browserName] = array(	
+							'name'			=> $browser['name'],
+							'link'			=> $browser['link'],
+							'lastUpdate'	=> date($this->dateFormat.' '.$this->timeFormat, time()),
+						);
+					}
+					$export[$browserName][$branchName] = array(
+						'releaseVersion'=>	$versions[$browserId][$branchId]['releaseVersion'],
+						'releaseDate'	=>	date($this->dateFormat, $versions[$browserId][$branchId]['releaseDate']),
+					);
+				}
+			}
+		}
+		return $export;
+		
+	}
+	
 	
 	
 	public function newVersion($new, $current, $browserId, $branchId) {
