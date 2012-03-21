@@ -9,36 +9,12 @@ $browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName L
 <div class="row">
 
 <?php
-/*	if (file_exists($this->dir.'/export/browsers.html')) {
-		echo file_get_contents($this->dir.'/export/browsers.html');
-	} else {
-		echo $this->template('browsers.tpl', array('browsers'=>$browsers));
-	}
-	*/
-$versions = $this->lib->browsersVersions->getVersions();
-$browsers = $this->lib->browsersVersions->getBrowsers();
-$branches = $this->lib->browsersVersions->getBranches();
 
-$export = array();
-foreach ($browsers as $browserId => $browser) {			// all browsers
-	foreach ($branches as $branchId=>$branchName) {		// all branches
-		$branchName = ucfirst($branchName);
-		if (isset($versions[$browserId][$branchId])) {	// check if we have version for this browser-branch
-			$browserName = strtolower($browser['shortName']);
-			if (!isset($export[$browserName])) {				// create export array if this browser is not in it yet 
-				$export[$browserName] = array(	
-					'name'			=> $browser['name'],
-					'link'			=> $browser['link'],
-					'lastUpdate'	=> date($this->lib->t('Y-m-d H:i:s'), time()),
-				);
-			}
-			$export[$browserName][$branchName] = array(
-				'releaseVersion'=>	$versions[$browserId][$branchId]['releaseVersion'],
-				'releaseDate'	=>	date($this->lib->t('Y-m-d'), $versions[$browserId][$branchId]['releaseDate']),
-			);
-		}
-	}
-}
+$this->lib->browsersVersions->dateFormat = $this->lib->t('Y-m-d');
+$this->lib->browsersVersions->timeFormat = $this->lib->t('H:i:s');
+	
+$export = $this->lib->browsersVersions->getExport();
+
 echo $this->template('browsers.tpl', array('browsers'=>$export))
 ?>
 
