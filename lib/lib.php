@@ -43,9 +43,16 @@ class lib {
 		$this->dir = dirname(__FILE__);
 		$this->libs = $libs;
 		$this->libsDefaultMethods = $libsDefaultMethods;
+		spl_autoload_register(array($this, 'load'));
 	}
 
-	
+    public function load($className) {
+		if (file_exists($this->dir.'/'.$className.'/'.$className.'.php')) {
+			include_once($this->dir.'/'.$className.'/'.$className.'.php');
+			return true;
+		}
+    }
+
 	private function getClass($className) {
 	
 		if (isset($this->libs[$className])) {
