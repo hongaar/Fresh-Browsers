@@ -477,14 +477,14 @@ class browsersVersions {
 	public function createSh() {
 		$branches = $this->getBranches();
 		$wikiLinks = $this->getWikiLinks();
-		$out = '#!/bin/sh'."\n";
+		$out = '#!/bin/sh' . PHP_EOL;
 		foreach ($wikiLinks as $browserName=>$branch) {
 			foreach ($branch as $branchName=>$link) {
 				if (in_array($branchName, $branches)) {
 					if ($this->createShTool=='curl') {
-						$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
+						$out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.'.txt' . PHP_EOL;
 					} else {
-						$out .= 'wget "'.$link.'" -O '.$this->dir.'/'.$browserName.'_'.$branchName.".txt\n";
+						$out .= 'wget "'.$link.'" -O '.$this->dir.'/'.$browserName.'_'.$branchName.'.txt '. PHP_EOL;
 					}
 				}
 			}
