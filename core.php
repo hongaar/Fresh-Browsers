@@ -7,7 +7,7 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-15
+ * Date: 2012-03-23
  */
  
 class core {
@@ -22,6 +22,10 @@ class core {
 	public $lib = null;
 	public $libs = array();
 	public $libsDefaultMethods = array();
+	
+	public $host = null;
+	public $scheme = null;
+	public $port = null;
 	
 	public $requestURI = null;
 	
@@ -51,6 +55,16 @@ class core {
 			$this->action = preg_replace('/[^a-zA-Z0-9_]/', '_', $action);
 		}
 		
+		$this->host = $_SERVER['SERVER_NAME'];
+
+		if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (!empty($_SERVER['HTTPS']) && $_SERVER['SERVER_PORT'] == 443)) {
+			$this->scheme = 'https';
+		} else {
+			$this->scheme = 'http';
+		}
+		
+		$this->port = $_SERVER['SERVER_PORT'];
+		
 	}	
 	
 	public function model() {
@@ -69,7 +83,6 @@ class core {
 	}
 	
 	public function template($__template__, $__out__ = null) {
-
 		if (isset($__out__) && is_array($__out__)) {
 			extract($__out__);
 		}
@@ -78,8 +91,20 @@ class core {
 		return ob_get_clean();
 	}
 	
-	public function link ($link, $full=false) {
-		return ($full?'http://'.$_SERVER['HTTP_HOST']:'').$this->subDir.((isset($link{0}) && $link{0}!='/')?'/':'').$link;
+	public function link ($in, $full=false) {
+		$link = '';
+		if ($full) {
+			$link .= $this->scheme . '://' . $this->host;
+			if (($this->port!=80 && $this->scheme=='http') || ($this->port!=443 && $this->scheme=='https')) {
+				$link .= ':' . $this->port;
+			}
+		}
+		$link .= $this->subDir;
+		if (isset($in{0}) && $in{0} != '/') {
+			$link .= '/';
+		}
+		$link .= $in;
+		return $link;
 	}
 	
 }
