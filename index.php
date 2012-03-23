@@ -18,6 +18,7 @@ $core->libs = array(
 						'pdo'	=>	array('PDO', 'sqlite:'.$core->dir.'/versions/browsers.sqlite'),
 						'db'	=>	array('PDOWrapper', '@pdo'),
 						'browsersVersions'	=>	array('browsersVersions', '@db'),
+						'variables'	=>	array('variables', '@db'),
 					);
 $core->libsDefaultMethods = array(
 					'user'	=>	'get',
