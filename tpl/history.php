@@ -65,15 +65,15 @@ $shortName = strtolower($browser['shortName']);
 		$versionPrev = null;
 		$out = '';
 		$head = '';
+		$n = 0;
 		foreach ($history[$browser['id']][$branchId] as $historyObj) {
 			$version = explode('.', $historyObj['releaseVersion']);
 			if (isset($version[3]) || (isset($version[2]) && isset($versionPrev[2]) && !isset($version[3]) && $versionPrev[2]==$version[2])) {
 				if (isset($versionPrev[2]) && ($versionPrev[2]!=$version[2] || $versionPrev[1]!=$version[1] || $versionPrev[0]!=$version[0])) {
-					echo $head
-						.$out
-						.(!empty($head)?'</div>':'');
+					echo $head.$out.(!empty($head)?'</div>':'');
 					$out = '';
 					$head = '';
+					$n = 0;
 				} 
 				if (!isset($versionPrev[2]) || $versionPrev[2]!=$version[2]) {
 					$head .= '<div class="browser-block" id="browser-'.$shortName.'-'.$branches[$branchId].'-'.$version[0].'-'.$version[1].'-'.$version[2].'">';
@@ -82,24 +82,25 @@ $shortName = strtolower($browser['shortName']);
 							.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']+3600*6).'</span>'
 							.'</div>';
 				}
-				
 			} else {
-				echo $head
-					.$out
-					.(!empty($head)?'</div>':'');
+				echo $head.$out.(!empty($head)?'</div>':'');
 				$out = '';
 				$head = '';
+				$n = 0;
 			}
-			
-			
 			$out .= '<div class="browser-version browser-'.$branches[$branchId].'-'.$shortName.'">'
 					.'<a href="'.$this->link('/history/'.$historyObj['id']).'" title="'.$browser['name'].' '.$historyObj['releaseVersion'].'">'.$historyObj['releaseVersion'].'</a>'
 					.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']+3600*6).'</span>'
 					.($this->edit ? ' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>' : '')
 					.'</div>';
+			$n++;
 			$versionPrev = $version;
 		}
-		echo $out;
+		if ($n>1) { 
+			echo $head.$out.(!empty($head)?'</div>':'');
+		} else {
+			echo $out;
+		}
 	} 
 	?>
 </div>

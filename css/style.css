@@ -100,3 +100,16 @@
 	font-size:80%;
 	color:#666;
 }
+
+a {
+	transition: color .3s;
+	-moz-transition: color .3s;
+	-webkit-transition: color .3s;
+	-o-transition: color .3s;
+}
+.nav > li > a {
+	transition: background .3s, border-color .3s;
+	-moz-transition: background .3s, border-color .3s;
+	-webkit-transition: background .3s, border-color .3s;
+	-o-transition: background .3s, border-color .3s;
+}
