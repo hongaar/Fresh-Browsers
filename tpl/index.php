@@ -29,6 +29,7 @@ echo $this->template('browsers.tpl', array('browsers'=>$export))
 	<li><a href="<?=$this->link('/export/browsers.serialized')?>">PHP serialized</a></li>
 	<li><a href="<?=$this->link('/export/browsers.html')?>">HTML</a></li>
 	<li><a href="<?=$this->link('/rss')?>">RSS</a></li>
+	<li><a href="http://twitter.com/FreshBrowsers">Twitter</a></li>
 </ul>
 </blockquote>
 
