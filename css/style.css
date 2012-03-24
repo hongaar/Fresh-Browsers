@@ -36,9 +36,23 @@
 	height:52px;
 	display:block;
 }
+.browsers h3,
 .browsers h4 {
 	margin-top:10px;
 }
+.browsers h3 {
+	font-size: 14px;
+	line-height: 18px;
+}
+.browsers .version {
+	font-weight:bold;
+	white-space:nowrap;
+}
+.browsers .date {
+	white-space:nowrap;
+	font-weight:bold;
+}
+
 .export ul li {
 	padding:5px 0 0 0;
 }
@@ -65,8 +79,23 @@
 	margin-bottom:10px;
 }
 
-.browsers ul {
+.history .browser-block .browser-version {
+	display:none;
 }
+.history .browser-block-active {
+	border:1px dashed #999;
+}
+.browser-title a {
+	text-decoration:none;
+}
+.browser-title a:hover {
+	border-bottom:1px dashed #999;
+}
+
+.hidden {
+	display:none;
+}
+
 .date {
 	font-size:80%;
 	color:#666;

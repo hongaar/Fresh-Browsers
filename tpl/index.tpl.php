@@ -11,6 +11,8 @@
     <link href="<?=$this->link('/css/bootstrap.min.css')?>" rel="stylesheet">
 	<link href="<?=$this->link('/css/style.css')?>" rel="stylesheet">
 	<link href="<?=$this->link('/rss')?>" title="Fresh Browsers RSS" type="application/rss+xml" rel="alternate">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+	<script type="text/javascript" src="<?=$this->link('/js/common.js')?>"></script>
 </head>
 
 <body>
@@ -18,8 +20,8 @@
 	<div class="container">
 	
 	<div class="hero-unit">
-		<h2>Fresh Browsers</h2>
-		<h1>Latest versions of major web browsers.</h1>
+		<h2><a href="<?=$this->link('/')?>">Fresh Browsers</a></h2>
+		<h1><?=isset($this->subtitle)?$this->subtitle:'The latest versions of major web browsers.'?></h1>
 	</div>
 	
 	<ul class="nav nav-tabs">
