@@ -1,11 +1,3 @@
-<?php
-
-$browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
-							->execute()
-							->fetchAll();
-
-?>
-
 <div class="row">
 
 <?php
@@ -43,8 +35,4 @@ echo $this->template('browsers.tpl', array('browsers'=>$export))
 	</ul-->
 </div>
 
-
-
 </div>
-
-

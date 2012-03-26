@@ -6,17 +6,15 @@ if (!$this->edit) {
 	return false;
 }
 
-$browsersArr = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
-						->execute()
-						->fetchAll();
+$browsers = $this->lib->browsersVersions->getBrowsers();
 					
 $browsers = array();
 $browsersValues = array(-1=>'---');
 
-foreach ($browsersArr as $browser) {
+foreach ($browsersArr as $browserId => $browser) {
 	$shortName = strtolower($browser['shortName']);
 	$browsers[$shortName] = $browser;
-	$browsersValues[$browser['id']] = $browser['name'];
+	$browsersValues[$browserId] = $browser['name'];
 }
 
 $branches = $this->lib->browsersVersions->branches;

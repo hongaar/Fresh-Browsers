@@ -5,6 +5,7 @@ $this->edit = false;
 $this->subtitle = 'The history of web browsers.';
 
 $branches = $this->lib->browsersVersions->getBranches();
+$browsers = $this->lib->browsersVersions->getBrowsers();
 
 if (isset($this->variables[0])) {
 	$id = (int) $this->variables[0];
@@ -14,7 +15,7 @@ if (isset($this->variables[0])) {
 						->fetch();
 	if ($obj!==false) {
 	
-		$browsers = $this->lib->browsersVersions->getBrowsers();
+		
 
 		?>
 		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.ucfirst($branches[$obj['branchId']]).')'?></h1>
@@ -24,21 +25,21 @@ if (isset($this->variables[0])) {
 		<a href="<?=$this->link('/history')?>">&larr; Back to history</a>
 		<?php
 		return true;
-	} 
+	}
 	
 }
 
 
-if (isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($branches[$_GET['branch']])) {
+if ((isset($_GET['branch']) && intval($_GET['branch'])>0 && isset($branches[$_GET['branch']]))) {
 	$branchId = intval($_GET['branch']);
 } else {
 	$branchId = 1;
 }
 
-$browsers = $this->lib->db->prepare('SELECT * FROM browsers ORDER BY shortName LIMIT 20')
-					->execute()
-					->fetchAll();
-		
+if (isset($this->variables[0]) && $this->variables[0]=='preview') {
+	$branchId = 3;
+}
+
 		
 $result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC LIMIT 1000')
 						->bind(':branchId', $branchId)
@@ -49,6 +50,12 @@ while ($browser = $result->fetch()) {
 }
 ?>
 <div class="history">
+
+<ul class="nav nav-pills">
+    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link($this->action)?>">Stable</a></li>
+    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link($this->action.'/preview')?>">Preview</a></li>
+</ul>
+
 <div class="row">
 
 <?php
@@ -61,16 +68,16 @@ $shortName = strtolower($browser['shortName']);
 	
 	<?php
 
-	if (isset($history[$browser['id']][$branchId])) {
+	if (isset($history[$browserId][$branchId])) {
 		$versionPrev = null;
 		$out = '';
 		$head = '';
 		$n = 0;
-		foreach ($history[$browser['id']][$branchId] as $historyObj) {
+		foreach ($history[$browserId][$branchId] as $historyObj) {
 			$version = explode('.', $historyObj['releaseVersion']);
 			if (isset($version[3]) || (isset($version[2]) && isset($versionPrev[2]) && !isset($version[3]) && $versionPrev[2]==$version[2])) {
 				if (isset($versionPrev[2]) && ($versionPrev[2]!=$version[2] || $versionPrev[1]!=$version[1] || $versionPrev[0]!=$version[0])) {
-					echo $head.$out.(!empty($head)?'</div>':'');
+					echo $n>1 ? $head.$out.(!empty($head)?'</div>':'') : $out;
 					$out = '';
 					$head = '';
 					$n = 0;
@@ -83,7 +90,7 @@ $shortName = strtolower($browser['shortName']);
 							.'</div>';
 				}
 			} else {
-				echo $head.$out.(!empty($head)?'</div>':'');
+				echo $n>1 ? $head.$out.(!empty($head)?'</div>':'') : $out;
 				$out = '';
 				$head = '';
 				$n = 0;
@@ -96,11 +103,7 @@ $shortName = strtolower($browser['shortName']);
 			$n++;
 			$versionPrev = $version;
 		}
-		if ($n>1) { 
-			echo $head.$out.(!empty($head)?'</div>':'');
-		} else {
-			echo $out;
-		}
+		echo $n>1 ? $head.$out.(!empty($head)?'</div>':'') : $out;
 	} 
 	?>
 </div>
