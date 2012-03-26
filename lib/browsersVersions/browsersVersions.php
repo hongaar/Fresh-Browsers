@@ -8,7 +8,7 @@
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-13
+ * Date: 2012-03-26
  *
  *
  */
@@ -16,7 +16,8 @@
  
 class browsersVersions {
 
-	public $links = 'links.php';
+	public $linksFile = 'links.php';
+	public $browsersFile = 'browsers.php';
 	
 	public $updateTimeOut = 3600; // как часто проверять версию браузера
 	
@@ -34,19 +35,14 @@ class browsersVersions {
 	public $db = null;
 	
 	public $doNotApprove = true;			// set this to true if you do not want to approve new versions by email
-	public $approveLink = '';
+	public $approveLink = null;
 	public $approveEmailFrom = '';
 	public $approveEmailTo = '';
 	
 	public $dateFormat = 'Y-m-d';
 	public $timeFormat = 'H:i:s';
 	
-	public $branches = array(
-		1	=>	'stable',
-		2	=>	'lts',
-		3	=>	'preview',
-		4	=>	'dev',
-	);
+
 	
 	public $versions = null;
 	public $browsers = null;
@@ -63,23 +59,21 @@ class browsersVersions {
 	
 	public function getBrowsers() {
 		if (!isset($this->browsers)) {
-			$result = $this->db->prepare('SELECT * FROM `browsers` LIMIT 100')
-								->execute();
-			$this->browsers = array();
-			while ($browser = $result->fetch()) {
-				$this->browsers[$browser['id']] = $browser;
-			}
+			$this->browsers = include($this->dir.'/'.$this->browsersFile);
 		}
-		return $this->browsers;
+		return $this->browsers['browsers'];
 	}
 	
 	public function getBranches() {
-		return $this->branches;
+		if (!isset($this->browsers)) {
+			$this->browsers = include($this->dir.'/'.$this->browsersFile);
+		}
+		return $this->browsers['branches'];
 	}
 	
 	public function getWikiLinks() {
 		if (!isset($this->wikiLinks)) {
-			$this->wikiLinks = include($this->dir.'/'.$this->links);
+			$this->wikiLinks = include($this->dir.'/'.$this->linksFile);
 		}
 		return $this->wikiLinks;
 	}
@@ -176,16 +170,7 @@ class browsersVersions {
 		}
 		
 		if ($this->approveEmailTo!='' && $this->approveEmailFrom!='') {
-			$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
-			$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
-						. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
-						. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
-						. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
-						. 'Delete: '.$this->approveLink.'/no/'.$code . "\n";
-			
-			$headers = 'From: Fresh Browsers <' . $this->approveEmailFrom . '>' . "\n" 
-						. 'Reply-To: ' . $this->approveEmailFrom . "\n";
-			$result = mail($this->approveEmailTo, $subject, $message, $headers);
+			$result = $this->approveMail($current, $new, $code);
 		}
 		
 		if ($result===false) {
@@ -195,6 +180,30 @@ class browsersVersions {
 		
 		return 'NEW: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
 		
+	}
+	
+	
+	private function approveMail($current, $new, $code) {
+		if (!isset($this->approveLink)) {
+			$this->approveLink = $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+		}
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
+		$browserId = $new['browserId'];
+		$branchId = $new['branchId'];
+		$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
+		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
+					. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
+					. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
+					. "\n"
+					. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
+					. "\n"
+					. 'Delete: '.$this->approveLink.'/no/'.$code . "\n"
+					. "\n\n";
+		
+		$headers = 'From: Fresh Browsers <' . $this->approveEmailFrom . '>' . "\n" 
+					. 'Reply-To: ' . $this->approveEmailFrom . "\n";
+		return mail($this->approveEmailTo, $subject, $message, $headers);
 	}
 	
 	
@@ -292,14 +301,45 @@ class browsersVersions {
 	
 	
 	public function autoApproveCheck() {
+	
+		$browsers = $this->getBrowsers();
+		$branches = $this->getBranches();
 		$result = $this->db->prepare('SELECT * FROM `check` WHERE __modified<:modified')
 							->bind(':modified', time()-$this->autoApproveTimeOut)
 							->execute();
-		while ($version = $result->fetch()) {
-			if ($this->addVersion($version)) {
-				$this->deleteFromCheck($version['id']);
+		$info = array();
+		while ($new = $result->fetch()) {
+			$browserId = $new['browserId'];
+			$branchId = $new['branchId'];
+			$current = $this->db->prepare('SELECT * FROM `history` WHERE browserId=:browserId AND branchId=:branchId ORDER BY releaseDate DESC LIMIT 1')
+								->bind(':browserId', $browserId)
+								->bind(':branchId', $branchId)
+								->execute()
+								->fetch();
+			$newArr = explode('.', $new['releaseVersion']);
+			$curArr = explode('.', $current['releaseVersion']);
+			
+			$majorNew = intval($newArr[0]);
+			$majorCur = intval($curArr[0]);
+			
+			// major new version > current version AND < current+2
+			// OR major is equal but versions are not equal
+			if (($majorNew>$majorCur && $majorNew<(2+$majorCur))
+				|| ($majorNew==$majorCur && $new['releaseVersion']!=$current['releaseVersion'])) {
+				if ($this->addVersion($new)) {
+					// $this->deleteFromCheck($new['id']);
+					$info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+				}
+			} else {
+				$info[] = 'AUTOUPDATE FAILED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+				$this->approveMail($current, $new, $new['code']);
+				$result = $this->db->prepare('UPDATE `check` SET __modified=:modified')
+									->bind(':modified', time())
+									->execute();
 			}
 		}
+		return $info;
+
 	}
 	
 	
@@ -335,7 +375,7 @@ class browsersVersions {
 		
 		$this->setLock();
 		
-		$this->autoApproveCheck();
+		$updated += $this->autoApproveCheck();
 		
 		$versions = $this->getVersions();
 		$browsers = $this->getBrowsers();
