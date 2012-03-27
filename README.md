@@ -1,6 +1,6 @@
 Fresh Browsers
 ==============
-Latest versions & history of major web browsers
+The latest versions and history of major web browsers.
 
 [fresh-browsers.com](http://fresh-browsers.com/)
 
@@ -8,13 +8,14 @@ Latest versions & history of major web browsers
 Installation
 ------------
 * Copy project directory to you webserver
-* Fill correct email adresses in tpl/update.php
+* Check parameters in tpl/update.php
 * Create curl_links_files.sh with /createsh link
 * Add curl_links_files.sh and /update to webserver crontab
 
 
-Todo
+To do
 ----
 * Authorization (add/edit/delete)
 * Mobile browsers
-* Display history in months grid
+* Add alternative history view (grid)
+* /update /createsh /twitter and so on should be CLI

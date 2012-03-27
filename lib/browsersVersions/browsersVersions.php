@@ -19,11 +19,11 @@ class browsersVersions {
 	public $linksFile = 'links.php';
 	public $browsersFile = 'browsers.php';
 	
-	public $updateTimeOut = 3600; // как часто проверять версию браузера
+	public $updateTimeOut = 3600; // 
 	
-	public $banTimeOut = 86400; // банить версию на сутки
+	public $banTimeOut = 86400; // ban version for 24h if version was disapproved
 	
-	public $checkTimeOut = 86400; // время до повторной отправки письма с проверкой версии
+	public $checkTimeOut = 86400; // send email with approve links once in 24h
 	
 	public $autoApproveTimeOut = 86400; // approve version from check if it longer then this in check table
 	
