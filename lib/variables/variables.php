@@ -25,11 +25,8 @@ class variables {
 			$this->variables[$row['name']] = array('id'=>$row['id'], 'value'=>unserialize($row['value']));
 		}
 
-	}
-	
-	
-	public function __destruct() {
-		$this->save();
+		register_shutdown_function(array($this, 'save'));
+		
 	}
 
 	
@@ -93,7 +90,7 @@ class variables {
 
 	
 	// запускается при завершении работы скрипта
-	private function save() {
+	public function save() {
 		if (!empty($this->change)) { // записываем данные, только если есть изменения
 			$deleteIds = array();
 			$insertArr = array();

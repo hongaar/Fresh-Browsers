@@ -50,13 +50,8 @@ class user {
 		include_once(dirname(__FILE__).'/session.php');
 		$this->session = new session();
 		$this->auth();
+		register_shutdown_function(array($this, 'save'));
     }
-	
-	// save user profile
-	public function __destruct() {
-		$this->save();
-	}
-	
 	
 	public function add($login, $password, $email='', $active=1, $data=array()) {
 		if (!in_array('edit_users', $this->user->roles)) {
