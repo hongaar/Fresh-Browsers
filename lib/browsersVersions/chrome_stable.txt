@@ -1,7 +1,7 @@
 {{LSR
 |article = Google Chrome
-|latest_release_version = 17.0.963.66  <!-- DO NOT LIST DEV RELEASES -->
-|latest_release_date = {{release date and age|2012|3|6}}
+|latest_release_version = 17.0.963.83  <!-- DO NOT LIST DEV RELEASES -->
+|latest_release_date = {{release date and age|2012|3|21}}
 }}<noinclude>
 
 ➔ Back to article "'''[[Google Chrome]]'''"

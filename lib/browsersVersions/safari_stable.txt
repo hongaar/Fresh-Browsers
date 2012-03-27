@@ -1,7 +1,7 @@
 {{LSR
 |article = Safari
-|latest_release_version = 5.1.3
-|latest_release_date = {{Start date and age|2012|02|01}}
+|latest_release_version = 5.1.5
+|latest_release_date = {{Start date and age|2012|03|26}}
 }}<noinclude>
 
 ➔ Back to article "'''[[Safari (web browser)]]'''"
@@ -11,4 +11,5 @@
 [[Category:Latest stable software release templates|Safari]]
 
 [[ko:틀:소프트웨어의 최신 버전 (안정판)/사파리 (웹 브라우저)]]
+[[zh:Template:Latest stable software release/Safari]]
 </noinclude>

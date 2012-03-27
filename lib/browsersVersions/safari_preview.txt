@@ -11,4 +11,5 @@
 [[Category:Latest preview software release templates|Safari]]
 
 [[ko:틀:소프트웨어의 최신 버전 (미리보기판)/사파리 (웹 브라우저)]]
+[[zh:Template:Latest preview software release/Safari]]
 </noinclude>

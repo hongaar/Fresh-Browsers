@@ -11,4 +11,5 @@
 [[Category:Latest stable software release templates|Opera]]
 
 [[ko:틀:소프트웨어의 최신 버전 (안정판)/오페라 (웹 브라우저)]]
+[[zh:Template:Latest stable software release/Opera]]
 </noinclude>

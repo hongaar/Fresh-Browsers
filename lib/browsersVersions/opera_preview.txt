@@ -1,7 +1,7 @@
 {{LPR|
  article = Opera
-|latest_release_version = 12.00 alpha (Build 1325) <!--http://snapshot.opera.com/windows/markedsdag_12.00-1325/Opera-Next-12.00-1325.exe-->
-|latest_release_date = {{Release date and age|2012|03|03}}
+|latest_release_version = 12.00 alpha (Build 1328) <!--http://snapshot.opera.com/windows/markedsdag_12.00-1325/Opera-Next-12.00-1325.exe-->
+|latest_release_date = {{Release date and age|2012|03|14}}
 }}<noinclude>
 
 ➔ Back to article "'''[[Opera (web browser)]]'''"
@@ -9,4 +9,5 @@
 [[Category:Latest preview software release templates|Opera]]
 
 [[ko:틀:소프트웨어의 최신 버전 (미리보기판)/오페라 (웹 브라우저)]]
+[[zh:Template:Latest preview software release/Opera]]
 </noinclude>
