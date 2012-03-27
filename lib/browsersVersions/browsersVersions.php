@@ -2,13 +2,13 @@
 
 /*
  * 
- * http:/www.elfimov.ru/browsers
+ * http://fresh-browsers.com
  *
  * Copyright (c) 2012 by Dmitry Elfimov
  * Released under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
  *
- * Date: 2012-03-26
+ * Date: 2012-03-27
  *
  *
  */
@@ -25,7 +25,7 @@ class browsersVersions {
 	
 	public $checkTimeOut = 86400; // время до повторной отправки письма с проверкой версии
 	
-	public $autoApproveTimeOut = 172800; // approve version from check if it longer then this in check table
+	public $autoApproveTimeOut = 86400; // approve version from check if it longer then this in check table
 	
 	public $lockTimeOut = 600; // 600
 	public $curl = false;
@@ -50,11 +50,9 @@ class browsersVersions {
 	
 	public $errors = array();
 
-	public function __construct($db=null) {
+	public function __construct($db) {
 		$this->dir = dirname(__FILE__);
-		if (isset($db)) {
-			$this->db = $db;
-		}
+		$this->db = $db;
 	}
 	
 	public function getBrowsers() {
@@ -194,7 +192,7 @@ class browsersVersions {
 		$subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
 		$message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
 					. 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
-					. 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n"
+					.(!empty($current) ? 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n" : '')
 					. "\n"
 					. 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
 					. "\n"
@@ -299,6 +297,18 @@ class browsersVersions {
 		return $count!==false && !empty($count);
 	}
 	
+	public function isNew($current, $new) {
+		$newArr = explode('.', $new['releaseVersion']);
+		$curArr = explode('.', $current['releaseVersion']);
+		
+		$majorNew = intval($newArr[0]);
+		$majorCur = intval($curArr[0]);
+		
+		// new major version > current version AND < current+2
+		// OR major versions are equal but minor are not equal
+		return ($majorNew>$majorCur && $majorNew<(2+$majorCur))
+				|| ($majorNew==$majorCur && $new['releaseVersion']!=$current['releaseVersion']);
+	}
 	
 	public function autoApproveCheck() {
 	
@@ -316,16 +326,8 @@ class browsersVersions {
 								->bind(':branchId', $branchId)
 								->execute()
 								->fetch();
-			$newArr = explode('.', $new['releaseVersion']);
-			$curArr = explode('.', $current['releaseVersion']);
-			
-			$majorNew = intval($newArr[0]);
-			$majorCur = intval($curArr[0]);
-			
-			// major new version > current version AND < current+2
-			// OR major is equal but versions are not equal
-			if (($majorNew>$majorCur && $majorNew<(2+$majorCur))
-				|| ($majorNew==$majorCur && $new['releaseVersion']!=$current['releaseVersion'])) {
+
+			if ($current!==false && $this->isNew($current, $new)) {
 				if ($this->addVersion($new)) {
 					// $this->deleteFromCheck($new['id']);
 					$info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
