@@ -1,8 +1,11 @@
+<?php
+$subtitle = isset($this->subtitle) ? $this->subtitle : 'The latest versions of major web browsers.';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Fresh Browsers</title>
+	<title>Fresh Browsers - <?=$subtitle?></title>
 	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -21,7 +24,7 @@
 	
 	<div class="hero-unit">
 		<h2><a href="<?=$this->link('/')?>">Fresh Browsers</a></h2>
-		<h1><?=isset($this->subtitle)?$this->subtitle:'The latest versions of major web browsers.'?></h1>
+		<h1><?=$subtitle?></h1>
 	</div>
 	
 	<ul class="nav nav-tabs">
