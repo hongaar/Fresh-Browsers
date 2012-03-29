@@ -41,7 +41,7 @@ if (isset($this->variables[0]) && $this->variables[0]=='preview') {
 }
 
 		
-$result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC LIMIT 1000')
+$result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchId ORDER BY browserId, releaseDate DESC, __modified DESC LIMIT 1000')
 						->bind(':branchId', $branchId)
 						->execute();
 $history = array();

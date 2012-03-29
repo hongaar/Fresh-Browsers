@@ -80,7 +80,7 @@ class browsersVersions {
 	public function getVersions($force = false) {
 		if (!isset($this->versions) || $force) {
 			$this->versions = array();
-			$result = $this->db->prepare('SELECT * FROM `history` GROUP BY branchId, browserId ORDER BY releaseDate DESC')
+			$result = $this->db->prepare('SELECT * FROM `history` GROUP BY branchId, browserId ORDER BY releaseDate DESC, __modified DESC')
 								->execute();
 			while ($browser = $result->fetch()) {
 				$this->versions[$browser['browserId']][$browser['branchId']] = array(
