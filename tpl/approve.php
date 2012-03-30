@@ -10,6 +10,7 @@ if (isset($this->variables[1])) {
 		} else {
 			echo 'APPROVED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date($this->lib->t('Y-m-d'),$browser['releaseDate']);
 			$this->template('makeexport.tpl');
+			$this->template('twitter');
 		}
 	} else 
 	if ($this->variables[0]=='no') {
