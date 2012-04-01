@@ -51,7 +51,21 @@ class core {
 		$qPos = strpos($request, '?');
 		$this->variables = explode('/', substr($request, 0, $qPos===false ? 1024 : $qPos));
 		$action = array_shift($this->variables);
-		if (isset($action) && $action!='') {
+		
+		if (!empty($action)) {
+			$actionOption = strtolower($action);
+			$options = array();
+			foreach ($this->options as $key=>$values) {
+				if (in_array($actionOption, $values)) {
+					$options[$key] = $actionOption;
+					$action = array_shift($this->variables);
+					break;
+				}
+			}
+			$this->options = $options;
+		}
+		
+		if (!empty($action)) {
 			$this->action = preg_replace('/[^a-zA-Z0-9_]/', '_', $action);
 		}
 		
@@ -65,7 +79,8 @@ class core {
 		
 		$this->port = $_SERVER['SERVER_PORT'];
 		
-	}	
+	}
+
 	
 	public function model() {
 		include($this->dir.'/lib/lib.php');

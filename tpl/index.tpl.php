@@ -1,5 +1,5 @@
 <?php
-$subtitle = isset($this->subtitle) ? $this->subtitle : 'The latest versions of major web browsers.';
+$subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest versions of major web browsers.');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +23,10 @@ $subtitle = isset($this->subtitle) ? $this->subtitle : 'The latest versions of m
 	<div class="container">
 	
 	<div class="hero-unit">
+		<ul class="nav nav-pills" id="language">
+			<li<?=$this->lib->t->language=='en'?' class="active"':''?>><a href="<?=$this->link('en/'.$this->action)?>">En</a></li>
+			<li<?=$this->lib->t->language=='ru'?' class="active"':''?>><a href="<?=$this->link('ru/'.$this->action)?>">Ru</a></li>
+		</ul>
 		<h2><a href="<?=$this->link('/')?>">Fresh Browsers</a></h2>
 		<h1><?=$subtitle?></h1>
 	</div>
