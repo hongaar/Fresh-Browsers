@@ -39,10 +39,10 @@ class lib {
 	private $dir = null;
 
 	
-	public function __construct($libs, $libsDefaultMethods) {
+	public function __construct($libs = null, $libsDefaultMethods = null) {
 		$this->dir = dirname(__FILE__);
-		$this->libs = $libs;
-		$this->libsDefaultMethods = $libsDefaultMethods;
+		$this->libs = !empty($libs) ? $libs : $this->libs;
+		$this->libsDefaultMethods = !empty($libsDefaultMethods) ? $libsDefaultMethods : $this->libsDefaultMethods;
 		spl_autoload_register(array($this, 'load'));
 	}
 

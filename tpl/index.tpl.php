@@ -1,4 +1,29 @@
 <?php
+
+$this->libs = array(
+						't'		=>	array('translate'),
+						'pdo'	=>	array('PDO', 'sqlite:'.$this->dir.'/versions/browsers.sqlite'),
+						'db'	=>	array('PDOWrapper', '@pdo'),
+						'browsersVersions'	=>	array('browsersVersions', '@db'),
+						'variables'	=>	array('variables', '@db'),
+					);
+$this->libsDefaultMethods = array(
+						'user'	=>	'get',
+						't'		=>	't',
+					);
+
+$languages = array('en'=>'English', 'ru'=>'Русский', 'de'=>'Deutsch');
+$languagesKeys = array_keys($languages);
+if (isset($languages[strtolower($this->action)])) {
+	$language = strtolower($this->action);
+	$this->action = $this->getAction(array_shift($this->variables));
+} else {
+	$language = null;
+}
+$this->libs['t'] = array('translate', null, $language, $languagesKeys[0], $languagesKeys);
+
+$out = $this->view();
+
 $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest versions of major web browsers.');
 ?>
 <!DOCTYPE html>
@@ -6,7 +31,6 @@ $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest
 <head>
 	<meta charset="utf-8">
 	<title>Fresh Browsers - <?=$subtitle?></title>
-	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
@@ -24,29 +48,30 @@ $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest
 	
 	<div class="hero-unit">
 		<ul class="nav nav-pills" id="language">
-			<li<?=$this->lib->t->language=='en'?' class="active"':''?>><a href="<?=$this->link('en/'.$this->action)?>">En</a></li>
-			<li<?=$this->lib->t->language=='ru'?' class="active"':''?>><a href="<?=$this->link('ru/'.$this->action)?>">Ru</a></li>
+		<?php foreach ($languages as $code => $name) { ?>
+			<li<?=$this->lib->t->language==$code?' class="active"':''?>><a href="<?=$this->link($code.'/'.$this->rawAction)?>" title="<?=$name?>"><?=ucfirst($code)?></a></li>
+		<?php } ?>
 		</ul>
-		<h2><a href="<?=$this->link('/')?>">Fresh Browsers</a></h2>
+		<h2><a href="<?=$this->link('/'.$this->lib->t->language)?>">Fresh Browsers</a></h2>
 		<h1><?=$subtitle?></h1>
 	</div>
 	
 	<ul class="nav nav-tabs">
-		<li<?=$this->action=='index'?' class="active"':''?>><a href="<?=$this->link('/')?>">Latest</a></li>
-		<li<?=$this->action=='history'?' class="active"':''?>><a href="<?=$this->link('/history')?>">History</a></li>
-		<li<?=$this->action=='about'?' class="active"':''?>><a href="<?=$this->link('/about')?>">About</a></li>
+		<li<?=$this->action=='index'?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language)?>"><?=$this->lib->t('Latest')?></a></li>
+		<li<?=$this->action=='history'?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/history')?>"><?=$this->lib->t('History')?></a></li>
+		<li<?=$this->action=='about'?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/about')?>"><?=$this->lib->t('About')?></a></li>
     </ul>
 	
 	<div id="content">
 	
-	<?=$this->out?>
+	<?=$out?>
 	
 	</div>
 
 	<hr>
 	
 	<footer>
-		<p>&copy; <a href="http://www.elfimov.ru">Dmitry Elfimov</a> 2011&mdash;<?=date('Y')?></p>
+		<p>&copy; <a href="http://www.elfimov.ru"><?=$this->lib->t('Dmitry Elfimov')?></a> 2011&mdash;<?=date('Y')?></p>
 	</footer>
 
     </div> <!-- /container -->

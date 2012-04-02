@@ -14,33 +14,37 @@ class core {
 	
 	public $dir = '';
 	public $indexPHP = 'index.php';
-	public $action = 'index';
-	public $mainTemplate = 'index.tpl';
-	public $subDir = '';
-	public $variables = array();
-	public $template = '';
-	public $lib = null;
-	public $libs = array();
-	public $libsDefaultMethods = array();
 	
+	public $defaultAction = 'index';
+	public $mainTemplate = 'index.tpl';
+	
+	public $requestURI = null;
+	
+	public $variables = array();
+	public $action = '';
+	public $rawAction = '';
+	public $subDir = '';
+
 	public $host = null;
 	public $scheme = null;
 	public $port = null;
 	
-	public $requestURI = null;
-	
+	private $get = array('lib'=>false);
+	public $libs = array();
+	public $libsDefaultMethods = array();
+
 	
 	public function __construct() {
 		$this->dir = dirname(__FILE__);
 	}
 	
-	public function render() {
-		$this->controller();
-		$this->model();
+	public function init() {
+		$this->initRouter();
+		$this->initLib();
 		return $this->view();
 	}
 	
-	public function controller() {
+	public function initRouter() {
 		if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && ($_SERVER['DOCUMENT_ROOT'].'/'.$this->indexPHP!=$_SERVER['SCRIPT_FILENAME'])) {
 			$serverScriptFilenameLength = strlen($_SERVER['SCRIPT_FILENAME']);
 			$serverDocumentRootLength = strlen($_SERVER['DOCUMENT_ROOT']);
@@ -51,23 +55,7 @@ class core {
 		$qPos = strpos($request, '?');
 		$this->variables = explode('/', substr($request, 0, $qPos===false ? 1024 : $qPos));
 		$action = array_shift($this->variables);
-		
-		if (!empty($action)) {
-			$actionOption = strtolower($action);
-			$options = array();
-			foreach ($this->options as $key=>$values) {
-				if (in_array($actionOption, $values)) {
-					$options[$key] = $actionOption;
-					$action = array_shift($this->variables);
-					break;
-				}
-			}
-			$this->options = $options;
-		}
-		
-		if (!empty($action)) {
-			$this->action = preg_replace('/[^a-zA-Z0-9_]/', '_', $action);
-		}
+		$this->action = $this->getAction($action);
 		
 		$this->host = $_SERVER['SERVER_NAME'];
 
@@ -81,11 +69,28 @@ class core {
 		
 	}
 
+	public function getAction($action) {
+		$this->rawAction = empty($action) ? '' : $action;
+		return empty($action) ? $this->defaultAction : preg_replace('/[^a-z0-9_]/', '_', strtolower($action));
+	}
 	
-	public function model() {
+	public function getLib() {
 		include($this->dir.'/lib/lib.php');
-		$this->lib = new lib($this->libs, $this->libsDefaultMethods);
-	}	
+		return new lib($this->libs, $this->libsDefaultMethods);
+	}
+	
+	public function __get($name) {
+		if (isset($this->get[$name])) {
+			if ($name=='lib' && $this->get[$name]===false) {
+				$this->get[$name] = $this->getLib();
+			}
+			return $this->get[$name];
+		}
+	}
+	
+	public function start() {
+		return $this->template($this->mainTemplate);
+	}
 	
 	public function view() {
 		if (!file_exists($this->dir.'/tpl/'.$this->action.'.php')) {
@@ -93,8 +98,7 @@ class core {
 			header("Status: 404 Not Found");
 			$this->action = 'error404';
 		}
-		$this->out = $this->template($this->action);
-		return $this->template($this->mainTemplate);
+		return $this->template($this->action);
 	}
 	
 	public function template($__template__, $__out__ = null) {
@@ -106,7 +110,7 @@ class core {
 		return ob_get_clean();
 	}
 	
-	public function link ($in, $full=false) {
+	public function link($in, $full=false) {
 		$link = '';
 		if ($full) {
 			$link .= $this->scheme . '://' . $this->host;

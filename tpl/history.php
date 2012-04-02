@@ -2,7 +2,7 @@
 
 $this->edit = false;
 
-$this->subtitle = 'The history of web browsers.';
+$this->subtitle = $this->lib->t('The history of web browsers.');
 
 $branches = $this->lib->browsersVersions->getBranches();
 $browsers = $this->lib->browsersVersions->getBrowsers();
@@ -22,7 +22,7 @@ if (isset($this->variables[0])) {
 		<p>Released: <?=date($this->lib->t('Y-m-d'), $obj['releaseDate']+3600*6)?></p>
 		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
 		<br>
-		<a href="<?=$this->link('/history')?>">&larr; Back to history</a>
+		<a href="<?=$this->link('/'.$this->lib->t->language.'/history')?>">&larr; Back to history</a>
 		<?php
 		return true;
 	}
@@ -52,8 +52,8 @@ while ($browser = $result->fetch()) {
 <div class="history">
 
 <ul class="nav nav-pills">
-    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link($this->action)?>">Stable</a></li>
-    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link($this->action.'/preview')?>">Preview</a></li>
+    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action)?>">Stable</a></li>
+    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/preview')?>">Preview</a></li>
 </ul>
 
 <div class="row">
@@ -96,7 +96,7 @@ $shortName = strtolower($browser['shortName']);
 				$n = 0;
 			}
 			$out .= '<div class="browser-version browser-'.$branches[$branchId].'-'.$shortName.'">'
-					.'<a href="'.$this->link('/history/'.$historyObj['id']).'" title="'.$browser['name'].' '.$historyObj['releaseVersion'].'">'.$historyObj['releaseVersion'].'</a>'
+					.'<a href="'.$this->link('/'.$this->lib->t->language.'/history/'.$historyObj['id']).'" title="'.$browser['name'].' '.$historyObj['releaseVersion'].'">'.$historyObj['releaseVersion'].'</a>'
 					.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']+3600*6).'</span>'
 					.($this->edit ? ' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>' : '')
 					.'</div>';
