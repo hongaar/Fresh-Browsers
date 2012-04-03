@@ -1,1 +1,1 @@
-<?phpreturn array();
+<?phpreturn array(	'Stable_history'	=>		'Stable',	'Preview_history'	=>		'Preview',		'about_text'		=>		'Fresh Browsers is an open-source project that aims to provide information about latest web browsers versions and web browsers history in several convenient formats.',	'get_sorce_text'	=>	'Get latest source code, get involved, submit code, and file bugs.',	);

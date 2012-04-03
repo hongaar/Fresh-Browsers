@@ -1,33 +1,9 @@
 <?php
-
-$this->libs = array(
-						't'		=>	array('translate'),
-						'pdo'	=>	array('PDO', 'sqlite:'.$this->dir.'/versions/browsers.sqlite'),
-						'db'	=>	array('PDOWrapper', '@pdo'),
-						'browsersVersions'	=>	array('browsersVersions', '@db'),
-						'variables'	=>	array('variables', '@db'),
-					);
-$this->libsDefaultMethods = array(
-						'user'	=>	'get',
-						't'		=>	't',
-					);
-
-$languages = array('en'=>'English', 'ru'=>'Русский', 'de'=>'Deutsch');
-$languagesKeys = array_keys($languages);
-if (isset($languages[strtolower($this->action)])) {
-	$language = strtolower($this->action);
-	$this->action = $this->getAction(array_shift($this->variables));
-} else {
-	$language = null;
-}
-$this->libs['t'] = array('translate', null, $language, $languagesKeys[0], $languagesKeys);
-
-$out = $this->view();
-
 $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest versions of major web browsers.');
+header('Content-Language: '.$this->lib->t->language); 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?=$this->lib->t->language?>">
 <head>
 	<meta charset="utf-8">
 	<title>Fresh Browsers - <?=$subtitle?></title>
@@ -48,7 +24,7 @@ $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest
 	
 	<div class="hero-unit">
 		<ul class="nav nav-pills" id="language">
-		<?php foreach ($languages as $code => $name) { ?>
+		<?php foreach ($this->languages as $code => $name) { ?>
 			<li<?=$this->lib->t->language==$code?' class="active"':''?>><a href="<?=$this->link($code.'/'.$this->rawAction)?>" title="<?=$name?>"><?=ucfirst($code)?></a></li>
 		<?php } ?>
 		</ul>
@@ -64,7 +40,7 @@ $subtitle = isset($this->subtitle) ? $this->subtitle : $this->lib->t('The latest
 	
 	<div id="content">
 	
-	<?=$out?>
+	<?=$this->out?>
 	
 	</div>
 

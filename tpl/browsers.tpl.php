@@ -8,7 +8,7 @@ foreach ($browsers as $shortName => $browser) {
 	foreach ($browser as $branchName=>$branch) {
 		if (is_array($branch)) {
 ?>
-	<h4><?=ucfirst($branchName)?></h4>
+	<h4><?=$this->lib->t($branchName)?></h4>
 	<div class="release">
 		<span class="version"><?=$branch['releaseVersion']?></span>
 		<span class="date"><?=$branch['releaseDate']?></span>

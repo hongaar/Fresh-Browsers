@@ -9,7 +9,9 @@ if (isset($this->variables[1])) {
 			echo implode('<br>', $this->lib->browsersVersions->errors);
 		} else {
 			echo 'APPROVED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date($this->lib->t('Y-m-d'),$browser['releaseDate']);
+			echo '<hr>';
 			$this->template('makeexport.tpl');
+			echo $this->template('twitter');
 		}
 	} else 
 	if ($this->variables[0]=='no') {

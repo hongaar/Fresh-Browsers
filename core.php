@@ -36,15 +36,7 @@ class core {
 	
 	public function __construct() {
 		$this->dir = dirname(__FILE__);
-	}
-	
-	public function init() {
-		$this->initRouter();
-		$this->initLib();
-		return $this->view();
-	}
-	
-	public function initRouter() {
+
 		if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && ($_SERVER['DOCUMENT_ROOT'].'/'.$this->indexPHP!=$_SERVER['SCRIPT_FILENAME'])) {
 			$serverScriptFilenameLength = strlen($_SERVER['SCRIPT_FILENAME']);
 			$serverDocumentRootLength = strlen($_SERVER['DOCUMENT_ROOT']);
@@ -54,6 +46,7 @@ class core {
 		$request = ltrim($this->requestURI, "/\/\\ \t\n\r\0\x0B");
 		$qPos = strpos($request, '?');
 		$this->variables = explode('/', substr($request, 0, $qPos===false ? 1024 : $qPos));
+		
 		$action = array_shift($this->variables);
 		$this->action = $this->getAction($action);
 		
@@ -88,17 +81,14 @@ class core {
 		}
 	}
 	
-	public function start() {
-		return $this->template($this->mainTemplate);
-	}
-	
-	public function view() {
+	public function render() {
 		if (!file_exists($this->dir.'/tpl/'.$this->action.'.php')) {
 			header("HTTP/1.0 404 Not Found");
 			header("Status: 404 Not Found");
 			$this->action = 'error404';
 		}
-		return $this->template($this->action);
+		$this->out = $this->template($this->action);
+		return $this->template($this->mainTemplate);
 	}
 	
 	public function template($__template__, $__out__ = null) {

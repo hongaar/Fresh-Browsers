@@ -52,8 +52,8 @@ while ($browser = $result->fetch()) {
 <div class="history">
 
 <ul class="nav nav-pills">
-    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action)?>">Stable</a></li>
-    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/preview')?>">Preview</a></li>
+    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action)?>"><?=$this->lib->t('Stable_history')?></a></li>
+    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/preview')?>"><?=$this->lib->t('Preview_history')?></a></li>
 </ul>
 
 <div class="row">

@@ -1,8 +1,6 @@
-<p>Fresh Browsers is an open-source project that aims 
-to provide information about latest web browsers versions 
-and web browsers history in several convient formats.</p>
+<p><?=$this->lib->t('about_text')?></p>
 
-<h3>Available formats</h3>
+<h3><?=$this->lib->t('Available formats')?></h3>
 
 <ul>
 	<li><a href="<?=$this->link('/export/browsers.xml')?>">XML</a></li>
@@ -16,6 +14,6 @@ and web browsers history in several convient formats.</p>
 
 <br>
 
-<p>Get latest source code, get involved, submit code, and file bugs.</p>
+<p><?=$this->lib->t('get_sorce_text')?></p>
 
-<p><a href="http://github.com/Groozly/Fresh-Browsers" class="btn btn-info">Fresh Browsers on GitHub</a></p>
+<p><a href="http://github.com/Groozly/Fresh-Browsers" class="btn btn-info"><?=$this->lib->t('Fresh Browsers on GitHub')?></a></p>

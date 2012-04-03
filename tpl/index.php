@@ -13,7 +13,7 @@ echo $this->template('browsers.tpl', array('browsers'=>$export))
 <div class="span2 export">
 
 <blockquote>
-<h4>Export</h4>
+<h4><?=$this->lib->t('Export')?></h4>
 <ul class="unstyled">
 	<li><a href="<?=$this->link('/export/browsers.xml')?>">XML</a></li>
 	<li><a href="<?=$this->link('/export/browsers.yaml')?>">YAML</a></li>
