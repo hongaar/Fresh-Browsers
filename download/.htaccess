@@ -1,0 +1,3 @@
+SetHandler application/octet-stream
+AddType application/octet-stream .txt
+Header set Content-Disposition attachment
