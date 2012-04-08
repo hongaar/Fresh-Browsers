@@ -16,10 +16,10 @@ if (isset($this->variables[0])) {
 	if ($obj!==false) {
 		?>
 		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.ucfirst($branches[$obj['branchId']]).')'?></h1>
-		<p>Released: <?=date($this->lib->t('Y-m-d'), $obj['releaseDate']+3600*6)?></p>
+		<p><?=$this->lib->t('Released')?>: <?=date($this->lib->t('Y-m-d'), $obj['releaseDate']+3600*6)?></p>
 		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
 		<br>
-		<a href="<?=$this->link('/'.$this->lib->t->language.'/history')?>">&larr; Back to history</a>
+		<a href="<?=$this->link('/'.$this->lib->t->language.'/history')?>">&larr; <?=$this->lib->t('Back to history')?></a>
 		<?php
 		return true;
 	}

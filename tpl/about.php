@@ -28,7 +28,7 @@
 	<div class="alert alert-info">
 		<strong>Heads up!</strong> 
 		<br>
-		Please help me to translate Fresh&nbsp;Browsers in your language.
+		Please help me translate Fresh&nbsp;Browsers into your language.
 		<br><br>
 		<strong>Instructions for translators.</strong> 
 		<br>
