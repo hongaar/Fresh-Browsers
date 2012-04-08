@@ -1,6 +1,6 @@
 .hero-unit {
 	border-radius: 0 0 6px 6px;
-	margin-bottom: 30px;
+	margin-bottom: 15px;
 	padding: 30px 60px 30px 60px;
 	position:relative;
 }
@@ -113,7 +113,7 @@
 .history th {
 	padding:0 5px 7px 5px;
 	vertical-align:top;
-	width:160px;
+	width:165px;
 	border-bottom:1px solid #eee;
 }
 .history th  {
@@ -133,13 +133,16 @@
 .history td:hover {
 	background:#eeeeee;
 }
+
 .history th.browsers-year,
 .history td.browsers-year {
 	font-weight:bold;
 	color:#999;
-	width:110px;
+	width:85px;
 }
-
+.row-year:hover .browsers-year {
+	color:#000;
+}
 .row-year,
 a {
 	transition: background .3s, border-color .3s, color .3s;
