@@ -42,6 +42,7 @@ class browsersVersions {
 	public $dateFormat = 'Y-m-d';
 	public $timeFormat = 'H:i:s';
 	
+	public $maxVersionsLimit = 10000;
 
 	
 	public $versions = null;
@@ -77,7 +78,25 @@ class browsersVersions {
 	}
 	
 	
-	public function getVersions($force = false) {
+	public function getVersions($conditions=null) {
+		$versions = array();
+		$result = $this->db->prepare('SELECT * FROM `history`'
+			.(!empty($condition) ? ' WHERE '.$conditions : '')
+			.' ORDER BY branchId, browserId, releaseDate DESC, __modified DESC'
+			.' LIMIT '.$this->maxVersionsLimit)
+			->execute();
+		while ($browser = $result->fetch()) {
+			$versions[$browser['browserId']][$browser['branchId']] = array(
+				'releaseVersion'	=> $browser['releaseVersion'],
+				'releaseDate'		=> $browser['releaseDate'],
+				'__modified'		=> $browser['__modified'],
+				'__id'				=> $browser['id'],
+			);
+		}
+		return $versions;
+	}
+	
+	public function getLatestVersions($force = false) {
 		if (!isset($this->versions) || $force) {
 			$this->versions = array();
 			$result = $this->db->prepare('SELECT * FROM `history` GROUP BY branchId, browserId ORDER BY releaseDate DESC, __modified DESC')
@@ -98,7 +117,7 @@ class browsersVersions {
 	
 	public function getExport() {
 	
-		$versions = $this->getVersions();
+		$versions = $this->getLatestVersions();
 		$browsers = $this->getBrowsers();
 		$branches = $this->getBranches();
 
@@ -379,7 +398,7 @@ class browsersVersions {
 		
 		$updated += $this->autoApproveCheck();
 		
-		$versions = $this->getVersions();
+		$versions = $this->getLatestVersions();
 		$browsers = $this->getBrowsers();
 		$branches = $this->getBranches();
 		
@@ -424,7 +443,7 @@ class browsersVersions {
 		}
 		
 		// forced versions update
-		$this->getVersions(true);
+		$this->getLatestVersions(true);
 		
 		$this->removeLock();
 		
