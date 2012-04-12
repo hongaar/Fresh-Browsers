@@ -1,6 +1,6 @@
 <?php
 
-$this->mainTemplate = 'empty.tpl';
+$this->mainTemplate = 'empty.tpl.php';
 
 if (isset($this->variables[1])) {
 	if ($this->variables[0]=='yes') {
@@ -10,8 +10,8 @@ if (isset($this->variables[1])) {
 		} else {
 			echo 'APPROVED: '. $browser['browserId'].' '.$browser['branchId'].' '.$browser['releaseVersion'].' '.date($this->lib->t('Y-m-d'),$browser['releaseDate']);
 			echo '<hr>';
-			$this->template('makeexport.tpl');
-			echo $this->template('twitter');
+			$this->template('makeexport.tpl.php');
+			echo $this->template('twitter.php');
 		}
 	} else 
 	if ($this->variables[0]=='no') {

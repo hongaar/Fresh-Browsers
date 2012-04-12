@@ -5,7 +5,7 @@
  *
  */
 
-$this->mainTemplate = 'empty.tpl';
+$this->mainTemplate = 'empty.tpl.php';
 
 // set false if you want to approve new versions
 $this->lib->browsersVersions->doNotApprove = true;
@@ -22,7 +22,7 @@ if ($updated===false) {
 } else 
 if (!empty($updated)) {
 	echo implode('<br>', $updated);
-	$this->template('makeexport.tpl'); // force export for autoApproveCheck() & doNotCheck=true
+	$this->template('makeexport.tpl.php'); // force export for autoApproveCheck() & doNotCheck=true
 } else {
 	echo 'nothing to do';
 }

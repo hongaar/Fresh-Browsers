@@ -13,7 +13,7 @@ file_put_contents($exportPath.'/browsers.xml', arrayToXML($export, '<browsers/>'
 
 file_put_contents($exportPath.'/browsers.yaml', $this->lib->sfYaml->dump($export));
 
-file_put_contents($exportPath.'/browsers.html', $this->template('browsers.tpl', array('browsers'=>$export)));
+file_put_contents($exportPath.'/browsers.html', $this->template('browsers.tpl.php', array('browsers'=>$export)));
 
 
 function arrayToXML($array, $xml) {

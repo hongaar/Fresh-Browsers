@@ -7,7 +7,7 @@ $this->lib->browsersVersions->timeFormat = $this->lib->t('H:i:s');
 	
 $export = $this->lib->browsersVersions->getExport();
 
-echo $this->template('browsers.tpl', array('browsers'=>$export))
+echo $this->template('browsers.tpl.php', array('browsers'=>$export))
 ?>
 
 <div class="span2 export">

@@ -1,48 +1,49 @@
 <?php
-
-/*
- * nanobanano framework 
- * https://github.com/Groozly/nanobanano
+/**
+ * Nanobanano framework 
+ * 
+ * PHP version 5
  *
- * Copyright (c) 2011-2012 by Dmitry Elfimov
- * Released under the MIT License.
- * http://www.opensource.org/licenses/mit-license.php
+ * @copyright 2012 Dmitry Elfimov
+ * @license   http://www.elfimov.ru/nanobanano/license.txt MIT License
+ * @link      http://elfimov.ru/nanobanano
  *
- * Date: 2012-04-03
+ */
+ 
+/**
+ * main index.php
+ *
+ * @package  Nanobanano
+ * @author   Dmitry Elfimov <elfimov@gmail.com>
+ *
  */
 
-require('core.php');
-
-$core = new core();
-
+require 'Core.php';
+$core = new Core();
 $core->libs = array(
-						't'		=>	array('translate'),
-						'pdo'	=>	array('PDO', 'sqlite:'.$core->dir.'/versions/browsers.sqlite'),
-						'db'	=>	array('PDOWrapper', '@pdo'),
-						'browsersVersions'	=>	array('browsersVersions', '@db'),
-						'variables'	=>	array('variables', '@db'),
-					);
+    't'                => array('Translate'),
+    'pdo'              => array('PDO', 'sqlite:'.$core->dir.'/versions/browsers.sqlite'),
+    'db'               => array('PDOWrapper', '@pdo'),
+    'session'          => array('Session'),
+    'user'             => array('User', '@db', '@session'),
+    'variables'        => array('Variables', '@db'),
+    'browsersVersions' => array('browsersVersions', '@db'),
+);
 $core->libsDefaultMethods = array(
-						'user'	=>	'get',
-						't'		=>	't',
-						);
+    'user'    =>    'get',
+    't'       =>    't',
+);
 $core->languages = array(	
-						'en'=>'English', 
-						'ru'=>'Русский', 
-//						'de'=>'Deutsch',
-					);
-$languagesKeys = array_keys($core->languages);
-
+    'en'=>'English', 
+    'ru'=>'Русский', 
+);
 if (isset($core->languages[$core->action])) {
 	$language = $core->action;
-	$core->action = $core->getAction(array_shift($core->variables));
+	$core->action = $core->getAction($core->variables);
 } else {
 	$language = null;
 }
-$core->libs['t'] = array('translate', null, $language, $languagesKeys[0], $languagesKeys);
+$languagesKeys = array_keys($core->languages);
+$core->libs['t'] = array('Translate', null, $language, $languagesKeys[0], $languagesKeys);
 
 echo $core->render();
-
-
-
-

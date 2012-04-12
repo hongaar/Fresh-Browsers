@@ -1,6 +1,6 @@
 <?php
 
-$this->mainTemplate = 'rss.tpl';
+$this->mainTemplate = 'rss.tpl.php';
 
 $browsers = $this->lib->browsersVersions->getBrowsers();
 $branches = $this->lib->browsersVersions->getBranches();
