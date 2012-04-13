@@ -16,7 +16,7 @@ if (isset($this->variables[0])) {
 	if ($obj!==false) {
 		?>
 		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['releaseVersion'].' ('.ucfirst($branches[$obj['branchId']]).')'?></h1>
-		<p><?=$this->lib->t('Released')?>: <?=date($this->lib->t('Y-m-d'), $obj['releaseDate']+3600*6)?></p>
+		<p><?=$this->lib->t('Released')?>: <?=date($this->lib->t('Y-m-d'), $obj['releaseDate'])?></p>
 		<?=($obj['note']!='') ? '<p>'.$obj['note'].'</p>' : ''?>
 		<br>
 		<a href="<?=$this->link('/'.$this->lib->t->language.'/history')?>">&larr; <?=$this->lib->t('Back to history')?></a>
@@ -40,7 +40,7 @@ $result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=:branchI
 $history = array();
 $yearMonths = array();
 while ($browser = $result->fetch()) {
-	$releaseDate = $browser['releaseDate']+3600*6;
+	$releaseDate = $browser['releaseDate'];
 	$year = date('Y', $releaseDate);
 	$month = date('n', $releaseDate);
 	$history[$year][$browser['browserId']][$month][] = $browser;
@@ -117,7 +117,7 @@ foreach ($history as $year => $yearHistory) {
 							if (!isset($versionPrev[2]) || $versionPrev[2]!=$version[2] || $versionPrev[1]!=$version[1] || $versionPrev[0]!=$version[0]) {
 								$head .= '<div class="browser-title browser-'.$branch.'-'.$shortName.'">'
 										.'<a href="#" title="Latest: '.$browser['name'].' '.$historyObj['releaseVersion'].'. Click for more">'.$version[0].'.'.$version[1].'.'.$version[2].'<span>...</span></a>'
-										.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']+3600*6).'</span>'
+										.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']).'</span>'
 										.'</div>';
 								$head .= '<div class="browser-block" id="browser-'.$shortName.'-'.$branch.'-'.$version[0].'-'.$version[1].'-'.$version[2].'">';
 							}
@@ -129,7 +129,7 @@ foreach ($history as $year => $yearHistory) {
 						} 
 						$out .= '<div class="browser-version browser-'.$branch.'-'.$shortName.'">'
 								.'<a href="'.$this->link('/'.$this->lib->t->language.'/history/'.$historyObj['id']).'" title="'.$browser['name'].' '.$historyObj['releaseVersion'].'">'.$historyObj['releaseVersion'].'</a>'
-								.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']+3600*6).'</span>'
+								.' <span class="date">'.date($this->lib->t('Y-m-d'), $historyObj['releaseDate']).'</span>'
 								.($this->edit ? ' <a href="'.$this->link('/edit/'.$historyObj['id']).'" class="icon-edit"></a> <a href="'.$this->link('/remove/'.$historyObj['id']).'" class="icon-remove"></a>' : '')
 								.'</div>';
 						$n++;
