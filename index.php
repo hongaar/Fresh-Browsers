@@ -27,7 +27,7 @@ $core->libs = array(
     'session'          => array('Session'),
     'user'             => array('User', '@db', '@session'),
     'variables'        => array('Variables', '@db'),
-    'browsersVersions' => array('browsersVersions', '@db'),
+    'browsersVersions' => array('BrowsersVersions', '@db'),
 );
 $core->libsDefaultMethods = array(
     'user'    =>    'get',
