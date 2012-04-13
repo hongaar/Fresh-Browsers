@@ -1,5 +1,9 @@
 <?php
 
+if (!empty($_GET['edit'])) {
+    echo $this->template('auth.php');
+}
+
 $this->edit = false;
 
 $this->subtitle = $this->lib->t('The history of web browsers.');

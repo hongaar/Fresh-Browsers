@@ -58,7 +58,7 @@ class User
     private $_roles = array(
         'admin'    =>    array('edit_users')
     );
-
+    
     /**
      * Constructor.
      *
@@ -177,6 +177,7 @@ class User
      */
     public function get($name=null) 
     {
+        $return = false;
         if (empty($name)) {
             $return = $this->_user;
         } else if ($this->_user!==false) {
@@ -184,8 +185,6 @@ class User
                 $return = $this->_user[$name];
             } else if (isset($this->_user['data'][$name])) {
                 $return = $this->_user['data'][$name];
-            } else {
-                $return = false;
             }
         }
         return $return;
@@ -228,12 +227,14 @@ class User
     /**
      * Authenticate user with specified login and password.
      *
+     * @todo 
+     *
      * @param string $login    users email or login
      * @param string $password users password
      *
      * @return user object or false
      */
-    public function login($login, $password) 
+    public function login($login, $password, $rememberMe = 0) 
     {
         $prepare = $this->_db->prepare(
             'SELECT * FROM users'
@@ -247,6 +248,7 @@ class User
             ->bind(':password', $this->_hash($password));
         $this->_user = $this->_loadUser($prepare);
         if ($this->_user!==false) {
+            $this->_session->setCookieParams($rememberMe);
             $this->_session->userID = $this->_user['id'];
         }
         return $this->_user;

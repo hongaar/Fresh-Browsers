@@ -14,6 +14,8 @@
 /**
  * Session class
  *
+ * @todo  for "remember me" option in login form
+ *
  * @package Session
  * @author  Dmitry Elfimov <elfimov@gmail.com>
  *
@@ -40,6 +42,22 @@ class Session
     public function __get($name)
     {
         return $_SESSION[$name];
+    }
+    
+    /**
+     * Cookie params setter.
+     * see http://ru2.php.net/manual/en/function.session-set-cookie-params.php
+     *
+     * @param integer $lifetime Lifetime of the session cookie, defined in seconds
+     * @param string  $path     Path on the domain where the cookie will work
+     * @param string  $domain   Cookie domain
+     * @param boolean $secure   If true cookie will only be sent over secure connections
+     * @param boolean $httponly If true then PHP will attempt to send the httponly flag
+     *
+     * @return no value is returned.
+     */
+    public function setCookieParams($lifetime, $path=null, $domain=null, $secure = null, $httponly = null) {
+        session_set_cookie_params($lifetime, $path, $domain, $secure, $httponly);
     }
 
     /**
