@@ -483,12 +483,22 @@ class browsersVersions {
 		$text = $this->getWikiText($browserName, $browserBranch);
 		if ($text!==false) {
 			$regexp = $wikiLinks[$browserName]['regexp'];
-			preg_match_all($regexp['version'], $text, $ver);
-			preg_match_all($regexp['date'], $text, $date);
+            if (isset($regexp['version_'.$browserBranch])) {
+                $versionPattern = $regexp['version_'.$browserBranch];
+            } else {
+                $versionPattern = $regexp['version'];
+            }
+            if (isset($regexp['date_'.$browserBranch])) {
+                $datePattern = $regexp['date_'.$browserBranch];
+            } else {
+                $datePattern = $regexp['date'];
+            }
+			preg_match_all($versionPattern, $text, $ver);
+			preg_match_all($datePattern, $text, $date);
 			if (isset($ver[1]) && !empty($ver[1])) {
 				$versions = array();
 				$dates = array();
-				foreach ($ver[1] as $n=>$version) {
+				foreach ($ver[1] as $n => $version) {
 					if (isset($date[2][$n]) && isset($date[3][$n]) && isset($date[4][$n])) {
 						$dateTimeStamp = mktime(0, 0, 0, $date[3][$n], $date[4][$n], $date[2][$n]);
 						if ($dateTimeStamp===false || $dateTimeStamp<0) {
