@@ -274,7 +274,7 @@ class User
      */
     private function _hash($password) 
     {
-        return substr(crypt($password, '$5$rounds=5000$'.$this->salt.'$'), 32);
+        return substr(crypt($password, '$5$rounds=5000$'.$this->_salt.'$'), 32);
         // return md5($password . $this->salt);
     }
     
@@ -295,7 +295,7 @@ class User
             $params = array_keys($user);
         }
         
-        if (!isset($this->userStorage[$user['id']])) {
+        if (!isset($this->_userStorage[$user['id']])) {
             return false;
         }
         
@@ -303,8 +303,8 @@ class User
         $changedParams = array();
         
         foreach ($params as $param) {
-            if (isset($this->userStorage[$user['id']][$param]) 
-                && $this->userStorage[$user['id']][$param]!=$user[$param]
+            if (isset($this->_userStorage[$user['id']][$param]) 
+                && $this->_userStorage[$user['id']][$param]!=$user[$param]
             ) {
                 $changed[] = $param;
                 $changedParams[] = $param.'=?';

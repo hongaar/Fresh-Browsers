@@ -17,6 +17,5 @@ jQuery(function($) {
 			$td.parents('table').find('td:nth-child(' + n + '), th:nth-child(' + n + ')').removeClass('highlight');
 		}
 	});
-
+    
 });
-

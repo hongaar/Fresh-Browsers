@@ -1,15 +1,20 @@
 {{LSR
 |article = Google Chrome
-|latest_release_version = 17.0.963.83  <!-- DO NOT LIST DEV RELEASES -->
-|latest_release_date = {{release date and age|2012|3|21}}
+|latest_release_version = 22.0.1229.94<!-- DO NOT LIST DEV RELEASES -->
+|latest_release_date = {{start date and age|2012|10|10}}
 }}<noinclude>
 
 ➔ Back to article "'''[[Google Chrome]]'''"
-
+{{Template reference list}}
 [[Category:Latest stable software release templates|Google Chrome]]
 
-[[ja:Template:Latest stable software release/Google Chrome]]
+[[be-x-old:Шаблён:Апошні стабільны выпуск/Google Chrome]]
+[[fr:Modèle:Dernière version stable/Google Chrome]]
 [[ko:틀:소프트웨어의 최신 버전 (안정판)/구글 크롬]]
+[[hu:Sablon:Legfrissebb stabil kiadás/Google Chrome]]
+[[ja:Template:Latest stable software release/Google Chrome]]
 [[pl:Szablon:Ostatnie stabilne wydanie/Google Chrome]]
+[[th:แม่แบบ:Latest stable software release/กูเกิล โครม]]
+[[zh-yue:Template:Latest stable software release/Google Chrome]]
 [[zh:Template:Latest stable software release/Google Chrome]]
 </noinclude>

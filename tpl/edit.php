@@ -7,17 +7,16 @@ if (!$this->edit) {
 }
 
 $browsers = $this->lib->browsersVersions->getBrowsers();
-					
-$browsers = array();
+
 $browsersValues = array(-1=>'---');
 
-foreach ($browsersArr as $browserId => $browser) {
+foreach ($browsers as $browserId => $browser) {
 	$shortName = strtolower($browser['shortName']);
 	$browsers[$shortName] = $browser;
 	$browsersValues[$browserId] = $browser['name'];
 }
 
-$branches = $this->lib->browsersVersions->branches;
+$branches = $this->lib->browsersVersions->getBranches();
 $branches[-1] = '---';
 
 $values = array(
@@ -36,6 +35,7 @@ if (isset($this->variables[0])) {
 						->bind(':id', $id)
 						->execute()
 						->fetch();
+
 	if ($historyObj!==false) {
 		$values = array(
 			'browser'	=>	$historyObj['browserId'],
@@ -114,8 +114,6 @@ if (isset($_POST) && !empty($_POST)) {
 	// print_r($values);
 	
 }
-
-
 
 ?>
 <br>

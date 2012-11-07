@@ -8,10 +8,10 @@
 $this->mainTemplate = 'empty.tpl.php';
 
 // set false if you want to approve new versions
-$this->lib->browsersVersions->doNotApprove = true;
+$this->lib->browsersVersions->doNotApprove = false;
 // change these emails to correct ones
-// $this->lib->browsersVersions->approveEmailFrom = 'browsers@mail.com';
-// $this->lib->browsersVersions->approveEmailTo = 'mail@mail.com';
+$this->lib->browsersVersions->approveEmailFrom = 'browsers@elfimov.ru';
+$this->lib->browsersVersions->approveEmailTo = 'elfimov@gmail.com';
 
 $this->lib->browsersVersions->approveLink = $this->link('/approve', true);
 
@@ -23,6 +23,7 @@ if ($updated===false) {
 if (!empty($updated)) {
 	echo implode('<br>', $updated);
 	$this->template('makeexport.tpl.php'); // force export for autoApproveCheck() & doNotCheck=true
+    $this->template('twitter.php');
 } else {
 	echo 'nothing to do';
 }

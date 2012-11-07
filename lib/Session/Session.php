@@ -14,8 +14,6 @@
 /**
  * Session class
  *
- * @todo  for "remember me" option in login form
- *
  * @package Session
  * @author  Dmitry Elfimov <elfimov@gmail.com>
  *
