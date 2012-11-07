@@ -51,9 +51,18 @@ class BrowsersVersions {
     
     public $errors = array();
 
+    
     public function __construct($db) {
         $this->dir = dirname(__FILE__);
         $this->db = $db;
+    }
+    
+    
+    public function getOs() {
+        if (!isset($this->browsers)) {
+            $this->browsers = include($this->dir.'/'.$this->browsersFile);
+        }
+        return $this->browsers['os'];
     }
     
     public function getBrowsers() {
@@ -78,7 +87,8 @@ class BrowsersVersions {
     }
     
     
-    public function getVersions($conditions=null) {
+    
+    public function getVersions($conditions = null) {
         $versions = array();
         $result = $this->db->prepare('SELECT * FROM `history`'
             .(!empty($condition) ? ' WHERE '.$conditions : '')
@@ -88,9 +98,9 @@ class BrowsersVersions {
         while ($browser = $result->fetch()) {
             $versions[$browser['browserId']][$browser['branchId']] = array(
                 'releaseVersion'    => $browser['releaseVersion'],
-                'releaseDate'        => $browser['releaseDate'],
+                'releaseDate'       => $browser['releaseDate'],
                 '__modified'        => $browser['__modified'],
-                '__id'                => $browser['id'],
+                '__id'              => $browser['id'],
             );
         }
         return $versions;
