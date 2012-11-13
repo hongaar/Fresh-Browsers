@@ -14,10 +14,10 @@
  */
  
  
-class BrowsersVersions {
+class BrowsersVersions 
+{
 
     public $linksFile = 'links.php';
-    public $browsersFile = 'browsers.php';
     
     public $updateTimeOut = 3600; // 
     
@@ -46,40 +46,41 @@ class BrowsersVersions {
 
     
     public $versions = null;
-    public $browsers = null;
     public $wikiLinks = null;
     
     public $errors = array();
 
+    private $_config = null;
+
     
-    public function __construct($db) {
+    public function __construct($db) 
+    {
         $this->dir = dirname(__FILE__);
         $this->db = $db;
+        $this->_config = include($this->dir.'/config.php');
     }
     
     
-    public function getOs() {
-        if (!isset($this->browsers)) {
-            $this->browsers = include($this->dir.'/'.$this->browsersFile);
-        }
-        return $this->browsers['os'];
+    public function getOSes() 
+    {
+        return $this->_config['os'];
     }
     
-    public function getBrowsers() {
-        if (!isset($this->browsers)) {
-            $this->browsers = include($this->dir.'/'.$this->browsersFile);
-        }
-        return $this->browsers['browsers'];
+    
+    public function getBrowsers() 
+    {
+        return $this->_config['browsers'];
     }
     
-    public function getBranches() {
-        if (!isset($this->browsers)) {
-            $this->browsers = include($this->dir.'/'.$this->browsersFile);
-        }
-        return $this->browsers['branches'];
+    
+    public function getBranches() 
+    {
+        return $this->_config['branches'];
     }
     
-    public function getWikiLinks() {
+    
+    public function getWikiLinks() 
+    {
         if (!isset($this->wikiLinks)) {
             $this->wikiLinks = include($this->dir.'/'.$this->linksFile);
         }
@@ -91,16 +92,16 @@ class BrowsersVersions {
     public function getVersions($conditions = null) {
         $versions = array();
         $result = $this->db->prepare('SELECT * FROM `history`'
-            .(!empty($condition) ? ' WHERE '.$conditions : '')
-            .' ORDER BY branchId, browserId, releaseDate DESC, __modified DESC'
-            .' LIMIT '.$this->maxVersionsLimit)
+                .(empty($conditions) ? '' : ' WHERE '.$conditions)
+                .' ORDER BY osId, branchId, browserId, releaseDate DESC, __modified DESC'
+                .' LIMIT '.$this->maxVersionsLimit)
             ->execute();
         while ($browser = $result->fetch()) {
-            $versions[$browser['browserId']][$browser['branchId']] = array(
-                'releaseVersion'    => $browser['releaseVersion'],
-                'releaseDate'       => $browser['releaseDate'],
-                '__modified'        => $browser['__modified'],
-                '__id'              => $browser['id'],
+            $versions[$browser['browserId']][$browser['branchId']][$browser['osId']] = array(
+                'version'    => $browser['version'],
+                'date'       => $browser['date'],
+                '__modified' => $browser['__modified'],
+                '__id'       => $browser['id'],
             );
         }
         return $versions;
@@ -109,14 +110,14 @@ class BrowsersVersions {
     public function getLatestVersions($force = false) {
         if (!isset($this->versions) || $force) {
             $this->versions = array();
-            $result = $this->db->prepare('SELECT * FROM `history` GROUP BY branchId, browserId ORDER BY releaseDate DESC, __modified DESC')
-                                ->execute();
+            $result = $this->db->prepare('SELECT * FROM `history` GROUP BY osId, branchId, browserId ORDER BY releaseDate DESC, __modified DESC')
+                               ->execute();
             while ($browser = $result->fetch()) {
-                $this->versions[$browser['browserId']][$browser['branchId']] = array(
-                    'releaseVersion'    => $browser['releaseVersion'],
-                    'releaseDate'        => $browser['releaseDate'],
-                    '__modified'        => $browser['__modified'],
-                    '__id'                => $browser['id'],
+                $this->versions[$browser['browserId']][$browser['branchId']][$browser['osId']] = array(
+                    'version'    => $browser['version'],
+                    'date'       => $browser['date'],
+                    '__modified' => $browser['__modified'],
+                    '__id'       => $browser['id'],
                 );
             }
         }
@@ -128,27 +129,30 @@ class BrowsersVersions {
     public function getExport() {
     
         $versions = $this->getLatestVersions();
+        
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
+        $oses = $this->getOSes();
 
         $export = array();
 
-        foreach ($browsers as $browserId => $browser) {            // all browsers
-            foreach ($branches as $branchId=>$branchName) {        // all branches
+        foreach ($browsers as $browserId => $browser) {              // all browsers
+            $browserName = strtolower($browser['shortName']);
+            foreach ($branches as $branchId => $branchName) {        // all branches
                 $branchName = ucfirst($branchName);
-                if (isset($versions[$browserId][$branchId])) {    // check if we have version for this browser-branch
-                    $browserName = strtolower($browser['shortName']);
-                    if (!isset($export[$browserName])) {                // create export array if this browser is not in it yet 
-                        $export[$browserName] = array(    
-                            'name'            => $browser['name'],
-                            'link'            => $browser['link'],
-                            'lastUpdate'    => date($this->dateFormat.' '.$this->timeFormat, time()),
+                foreach ($oses as $osId => $osArr) {                 // all oses
+                    if (isset($versions[$browserId][$branchId][$osId])) {   // check if we have version for this browser-branch
+                        if (!isset($export[$browserName])) {                // create export array if this browser is not in it yet 
+                            $export[$browserName] = array(    
+                                'name'       => $browser['name'],
+                                'link'       => $browser['link'],
+                            );
+                        }
+                        $export[$browserName][$branchName][$osArr[0]] = array(
+                            'version' => $versions[$browserId][$branchId]['version'],
+                            'date'    => date($this->dateFormat, $versions[$browserId][$branchId]['date']),
                         );
                     }
-                    $export[$browserName][$branchName] = array(
-                        'releaseVersion'=>    $versions[$browserId][$branchId]['releaseVersion'],
-                        'releaseDate'    =>    date($this->dateFormat, $versions[$browserId][$branchId]['releaseDate']),
-                    );
                 }
             }
         }
@@ -158,70 +162,75 @@ class BrowsersVersions {
     
     
     
-    public function newVersion($new, $current, $browserId, $branchId) {
-                    
+    public function newVersion($new, $current, $browserId, $branchId, $osId) 
+    {
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
+        $oses = $this->getOSes();
         
         if ($this->doNotApprove) {
             $this->addVersion(array(
-                'browserId'            => $browserId,
-                'branchId'            => $branchId,
-                'releaseVersion'    => $new['releaseVersion'],
-                'releaseDate'        => $new['releaseDate']
+                'browserId' => $browserId,
+                'branchId'  => $branchId,
+                'osId'      => $osId,
+                'version'   => $new['version'],
+                'date'      => $new['date']
             ));
-            return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+            return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
         if ($this->isBanned($new)) {
-            return 'BANNED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+            return 'BANNED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
         if ($this->isCheck($new)) {
-            return 'CHECKING: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+            return 'CHECKING: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
         $code = md5(uniqid(rand()));
         
-        $result = $this->db->prepare('INSERT INTO `check` (browserId, branchId, releaseVersion, releaseDate, code, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :code, :modified)')
+        $result = $this->db->prepare('INSERT INTO `check` (browserId, branchId, osId, version, `date`, code, __modified) VALUES (:browserId, :branchId, :osId, :version, :date, :code, :modified)')
             ->bind(':browserId', $browserId)
             ->bind(':branchId', $branchId)
-            ->bind(':releaseVersion', $new['releaseVersion'])
-            ->bind(':releaseDate', $new['releaseDate'])
+            ->bind(':osId', $osId)
+            ->bind(':version', $new['version'])
+            ->bind(':date', $new['date'])
             ->bind(':code', $code)
             ->bind(':modified', time())
             ->execute();
-        if ($result===false) {
+        if ($result === false) {
             $this->errors[] = 'newVersions error: can\'t insert into check table';
             return false;
         }
         
-        if ($this->approveEmailTo!='' && $this->approveEmailFrom!='') {
+        if ($this->approveEmailTo != '' && $this->approveEmailFrom != '') {
             $result = $this->approveMail($current, $new, $code);
         }
         
-        if ($result===false) {
+        if ($result === false) {
             $this->errors[] = 'newVersions error: can\'t send email';
             return false;
         }
         
-        return 'NEW: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
-        
+        return 'NEW: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
     }
     
     
-    private function approveMail($current, $new, $code) {
+    private function approveMail($current, $new, $code) 
+    {
         if (!isset($this->approveLink)) {
             $this->approveLink = $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
         }
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
+        $oses = $this->getOSes();
         $browserId = $new['browserId'];
         $branchId = $new['branchId'];
-        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['releaseVersion'].' ('.$branches[$branchId].')';
+        $osId = $new['osId'];
+        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['version'].' ('.$branches[$branchId].' '.$oses[$osId].')';
         $message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
-                    . 'New: '.$new['releaseVersion'] . ' ('.date('Y-m-d', $new['releaseDate']).')' . "\n"
-                    .(!empty($current) ? 'Old: '.$current['releaseVersion'].' ('.date('Y-m-d', $current['releaseDate']).')' . "\n" : '')
+                    . 'New: '.$new['version'] . ' ('.date('Y-m-d', $new['date']).')' . "\n"
+                    .(!empty($current) ? 'Old: '.$current['version'].' ('.date('Y-m-d', $current['date']).')' . "\n" : '')
                     . "\n"
                     . 'Approve: '.$this->approveLink.'/yes/'.$code . "\n"
                     . "\n"
@@ -234,34 +243,34 @@ class BrowsersVersions {
     }
     
     
-    public function deleteFromCheck($version) {
+    public function deleteFromCheck($version) 
+    {
         if (is_array($version)) {
-            return $this->db->prepare('DELETE FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate')
+            return $this->db->prepare('DELETE FROM `check` WHERE browserId=:browserId AND osId=:osId AND branchId=:branchId AND version=:version AND date=:date')
                             ->bind(':browserId', $version['browserId'])
                             ->bind(':branchId', $version['branchId'])
-                            ->bind(':releaseVersion', $version['releaseVersion'])
-                            ->bind(':releaseDate', $version['releaseDate'])
+                            ->bind(':osId', $version['osId'])
+                            ->bind(':version', $version['version'])
+                            ->bind(':date', $version['date'])
                             ->execute();
         } else {
-            return $this->db->prepare('DELETE FROM `check` WHERE id=:id')
-                            ->bind(':id', $version)
-                            ->execute();
+            return $this->db->prepare('DELETE FROM `check` WHERE id=?')->execute($version);
         }
     }
     
     
-    public function approveNewVersion($code) {
-    
+    public function approveNewVersion($code) 
+    {
         // get version by hash code
         $version = $this->getCheckByCode($code);
         
-        if ($version===false) {
+        if ($version === false) {
             $this->errors[] = 'approveNewVersion error: version is already checked or deleted';
             return false;
         }
         
         // add version to history
-        if ($this->addVersion($version)===false) {
+        if ($this->addVersion($version) === false) {
             $this->errors[] = 'approveNewVersion error: can\'t add new version to history table';
             return false;
         }
@@ -273,10 +282,11 @@ class BrowsersVersions {
     }
     
     
-    public function deleteNewVersion($code) {
+    public function deleteNewVersion($code) 
+    {
         $version = $this->getCheckByCode($code);
         
-        if ($version===false) {
+        if ($version === false) {
             $this->errors[] = 'deleteNewVersion error: version is already checked or deleted';
             return false;
         }
@@ -291,44 +301,52 @@ class BrowsersVersions {
     }
     
     
-    public function addToBan($version) {
-        return $result = $this->db->prepare('INSERT INTO `ban` (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
-                                    ->bind(':browserId', $version['browserId'])
-                                    ->bind(':branchId', $version['branchId'])
-                                    ->bind(':releaseVersion', $version['releaseVersion'])
-                                    ->bind(':releaseDate', $version['releaseDate'])
-                                    ->bind(':modified', time())
-                                    ->execute();
+    public function addToBan($version) 
+    {
+        return $result = $this->db->prepare('INSERT INTO `ban` (browserId, branchId, osId, version, `date`, __modified) VALUES (:browserId, :branchId, :osId, :version, :date, :modified)')
+                                  ->bind(':browserId', $version['browserId'])
+                                  ->bind(':branchId', $version['branchId'])
+                                  ->bind(':osId', $version['osId'])
+                                  ->bind(':version', $version['version'])
+                                  ->bind(':date', $version['date'])
+                                  ->bind(':modified', time())
+                                  ->execute();
     }
     
-    public function isBanned($version) {
-        $count = $this->db->prepare('SELECT * FROM `ban` WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate AND __modified>:modified')
+    public function isBanned($version) 
+    {
+        $count = $this->db->prepare('SELECT * FROM `ban` WHERE browserId=:browserId AND branchId=:branchId AND osId=:osId AND version=:version AND `date`=:date AND __modified > :modified')
                             ->bind(':browserId', $version['browserId'])
                             ->bind(':branchId', $version['branchId'])
-                            ->bind(':releaseVersion', $version['releaseVersion'])
-                            ->bind(':releaseDate', $version['releaseDate'])
+                            ->bind(':osId', $version['osId'])
+                            ->bind(':version', $version['version'])
+                            ->bind(':date', $version['date'])
                             ->bind(':modified', time()-$this->banTimeOut)
                             ->execute()
                             ->fetch();
-        return $count!==false && !empty($count);
+        return $count !== false && !empty($count);
     }
     
     
-    public function isCheck($version) {
-        $count = $this->db->prepare('SELECT * FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND releaseVersion=:releaseVersion AND releaseDate=:releaseDate AND __modified>:modified')
+    public function isCheck($version) 
+    {
+        $count = $this->db->prepare('SELECT * FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND osId=:osId AND version=:version AND `date`=:date AND __modified > :modified')
                             ->bind(':browserId', $version['browserId'])
                             ->bind(':branchId', $version['branchId'])
-                            ->bind(':releaseVersion', $version['releaseVersion'])
-                            ->bind(':releaseDate', $version['releaseDate'])
+                            ->bind(':osId', $version['osId'])
+                            ->bind(':version', $version['version'])
+                            ->bind(':date', $version['date'])
                             ->bind(':modified', time()-$this->checkTimeOut)
                             ->execute()
                             ->fetch();
         return $count!==false && !empty($count);
     }
     
-    public function isNew($current, $new) {
-        $newArr = explode('.', $new['releaseVersion']);
-        $curArr = explode('.', $current['releaseVersion']);
+    
+    public function isNew($current, $new) 
+    {
+        $newArr = explode('.', $new['version']);
+        $curArr = explode('.', $current['version']);
         
         $majorNew = intval($newArr[0]);
         $majorCur = intval($curArr[0]);
@@ -336,67 +354,69 @@ class BrowsersVersions {
         // new major version > current version AND < current+2
         // OR major versions are equal but minor are not equal
         return ($majorNew>$majorCur && $majorNew<(2+$majorCur))
-                || ($majorNew==$majorCur && $new['releaseVersion']!=$current['releaseVersion']);
+                || ($majorNew==$majorCur && $new['version']!=$current['version']);
     }
     
-    public function autoApproveCheck() {
     
+    public function autoApproveCheck() 
+    {
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
-        $result = $this->db->prepare('SELECT * FROM `check` WHERE __modified<:modified')
-                            ->bind(':modified', time()-$this->autoApproveTimeOut)
-                            ->execute();
+        $oses = $this->getOSes();
+        
+        $result = $this->db->prepare('SELECT * FROM `check` WHERE __modified < :modified')
+                           ->bind(':modified', time()-$this->autoApproveTimeOut)
+                           ->execute();
         $info = array();
         while ($new = $result->fetch()) {
             $browserId = $new['browserId'];
             $branchId = $new['branchId'];
-            $current = $this->db->prepare('SELECT * FROM `history` WHERE browserId=:browserId AND branchId=:branchId ORDER BY releaseDate DESC LIMIT 1')
+            $osId = $new['osId'];
+            $current = $this->db->prepare('SELECT * FROM `history` WHERE browserId=:browserId AND branchId=:branchId AND osId=:osId ORDER BY `date` DESC LIMIT 1')
                                 ->bind(':browserId', $browserId)
                                 ->bind(':branchId', $branchId)
+                                ->bind(':osId', $osId)
                                 ->execute()
                                 ->fetch();
 
             if ($current!==false && $this->isNew($current, $new)) {
                 if ($this->addVersion($new)) {
                     // $this->deleteFromCheck($new['id']);
-                    $info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+                    $info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
                 }
             } else {
-                $info[] = 'AUTOUPDATE FAILED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$new['releaseVersion'].' ('.date('Y-m-d', $new['releaseDate']).')';
+                $info[] = 'AUTOUPDATE FAILED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
                 $this->approveMail($current, $new, $new['code']);
-                $result = $this->db->prepare('UPDATE `check` SET __modified=:modified')
-                                    ->bind(':modified', time())
-                                    ->execute();
+                $result = $this->db->prepare('UPDATE `check` SET __modified=?')->execute(time());
             }
         }
         return $info;
-
     }
     
     
-    public function addVersion($version) {
-    
-        return $this->db->prepare('INSERT INTO `history` (browserId, branchId, releaseVersion, releaseDate, __modified) VALUES (:browserId, :branchId, :releaseVersion, :releaseDate, :modified)')
+    public function addVersion($version) 
+    {
+        return $this->db->prepare('INSERT INTO `history` (browserId, branchId, osId, version, `date`, __modified) VALUES (:browserId, :branchId, :osId, :version, :date, :modified)')
             ->bind(':browserId', $version['browserId'])
             ->bind(':branchId', $version['branchId'])
-            ->bind(':releaseVersion', $version['releaseVersion'])
-            ->bind(':releaseDate', $version['releaseDate'])
+            ->bind(':osId', $version['osId'])
+            ->bind(':version', $version['version'])
+            ->bind(':date', $version['date'])
             ->bind(':modified', time())
             ->execute();
-    
     }
 
 
-    public function getCheckByCode($code) {
-        return $this->db->prepare('SELECT * FROM `check` WHERE code=:code')
-                    ->bind(':code', $code)
-                    ->execute()
+    public function getCheckByCode($code) 
+    {
+        return $this->db->prepare('SELECT * FROM `check` WHERE code=?')
+                    ->execute($code)
                     ->fetch();
     }
 
 
-    public function updateVersions() {
-    
+    public function updateVersions() 
+    {
         if ($this->isLock()) {
             return false;
         }
@@ -411,6 +431,7 @@ class BrowsersVersions {
         $versions = $this->getLatestVersions();
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
+        $oses = $this->getOSes();
         
         $wikiLinks = $this->getWikiLinks();
         foreach ($browsers as $browserId => $browser) {
@@ -419,10 +440,10 @@ class BrowsersVersions {
                 $branchId = array_search($branchName, $branches);
                 if ($branchId!==false && !isset($versions[$browserId][$branchId])) {
                     $versions[$browserId][$branchId] = array(
-                                        'releaseVersion'    => 0,
-                                        'releaseDate'        => 0,
-                                        '__modified'        => 0,
-                                        '__id'                => 0,
+                                        'version'    => 0,
+                                        'date'       => 0,
+                                        '__modified' => 0,
+                                        '__id'       => 0,
                                     );
                 }
             }
@@ -440,9 +461,9 @@ class BrowsersVersions {
             $new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
             if ($new!==false) {
                 $current = $versions[$browser['browserId']][$browser['branchId']];
-                if (isset($new['releaseDate'])  && isset($new['releaseVersion'])
-                    && trim($new['releaseVersion']) != ''
-                    && $new['releaseDate'] > $current['releaseDate']
+                if (isset($new['date'])  && isset($new['version'])
+                    && trim($new['version']) != ''
+                    && $new['date'] > $current['date']
                     ) {
                     $info = $this->newVersion($new, $current, $browser['browserId'], $browser['branchId']);
                     if ($info!==false) {
@@ -518,7 +539,7 @@ class BrowsersVersions {
                     } else {
                         $dateTimeStamp = 0;
                     }
-                    $versions = array('browserId'=>$browserId, 'branchId'=>$branchId, 'releaseVersion'=>trim($version), 'releaseDate'=>$dateTimeStamp);
+                    $versions = array('browserId'=>$browserId, 'branchId'=>$branchId, 'version'=>trim($version), 'date'=>$dateTimeStamp);
                     break;
                 }
             }
@@ -533,13 +554,13 @@ class BrowsersVersions {
             $wikiLinks = $this->getWikiLinks();
             $ch = curl_init();
             $options = array(
-                CURLOPT_URL                =>    $wikiLinks[$browserName][$branchName],
-                CURLOPT_RETURNTRANSFER    =>    true,
-                CURLOPT_FOLLOWLOCATION    =>    true,
-                CURLOPT_MAXREDIRS        =>    10,
-                CURLOPT_HEADER            =>    false, 
-                CURLOPT_TIMEOUT            =>    4, 
-                CURLOPT_USERAGENT        =>    $this->userAgent
+                CURLOPT_URL            => $wikiLinks[$browserName][$branchName],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS      => 10,
+                CURLOPT_HEADER         => false, 
+                CURLOPT_TIMEOUT        => 4, 
+                CURLOPT_USERAGENT      => $this->userAgent
             );
             curl_setopt_array($ch, $options);
             $text = curl_exec($ch);
@@ -560,8 +581,8 @@ class BrowsersVersions {
         $branches = $this->getBranches();
         $wikiLinks = $this->getWikiLinks();
         $out = '#!/bin/sh' . PHP_EOL;
-        foreach ($wikiLinks as $browserName=>$branch) {
-            foreach ($branch as $branchName=>$link) {
+        foreach ($wikiLinks as $browserName => $branch) {
+            foreach ($branch as $branchName => $link) {
                 if (in_array($branchName, $branches)) {
                     if ($this->createShTool=='curl') {
                         $out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.'.txt' . PHP_EOL;
