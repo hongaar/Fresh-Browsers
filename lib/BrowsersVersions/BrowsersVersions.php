@@ -50,14 +50,16 @@ class BrowsersVersions
     
     public $errors = array();
 
+	private $_dir = null;
+	
     private $_config = null;
 
     
-    public function __construct($db) 
+    public function __construct(PDOWrapper $db)
     {
-        $this->dir = dirname(__FILE__);
+        $this->_dir = dirname(__FILE__);
         $this->db = $db;
-        $this->_config = include($this->dir.'/config.php');
+        $this->_config = include $this->_dir.'/config.php';
     }
     
     
@@ -82,18 +84,19 @@ class BrowsersVersions
     public function getWikiLinks() 
     {
         if (!isset($this->wikiLinks)) {
-            $this->wikiLinks = include($this->dir.'/'.$this->linksFile);
+            $this->wikiLinks = include $this->_dir.'/'.$this->linksFile;
         }
         return $this->wikiLinks;
     }
     
     
     
-    public function getVersions($conditions = null) {
+    public function getVersions($conditions = null) 
+	{
         $versions = array();
         $result = $this->db->prepare('SELECT * FROM `history`'
                 .(empty($conditions) ? '' : ' WHERE '.$conditions)
-                .' ORDER BY osId, branchId, browserId, releaseDate DESC, __modified DESC'
+                .' ORDER BY osId, branchId, browserId, `date` DESC, __modified DESC'
                 .' LIMIT '.$this->maxVersionsLimit)
             ->execute();
         while ($browser = $result->fetch()) {
@@ -107,10 +110,11 @@ class BrowsersVersions
         return $versions;
     }
     
-    public function getLatestVersions($force = false) {
+    public function getLatestVersions($force = false) 
+	{
         if (!isset($this->versions) || $force) {
             $this->versions = array();
-            $result = $this->db->prepare('SELECT * FROM `history` GROUP BY osId, branchId, browserId ORDER BY releaseDate DESC, __modified DESC')
+            $result = $this->db->prepare('SELECT * FROM `history` GROUP BY osId, branchId, browserId ORDER BY `date` DESC, __modified DESC')
                                ->execute();
             while ($browser = $result->fetch()) {
                 $this->versions[$browser['browserId']][$browser['branchId']][$browser['osId']] = array(
@@ -126,10 +130,10 @@ class BrowsersVersions
     
 
     
-    public function getExport() {
+    public function getExport() 
+	{
     
         $versions = $this->getLatestVersions();
-        
         $browsers = $this->getBrowsers();
         $branches = $this->getBranches();
         $oses = $this->getOSes();
@@ -149,8 +153,8 @@ class BrowsersVersions
                             );
                         }
                         $export[$browserName][$branchName][$osArr[0]] = array(
-                            'version' => $versions[$browserId][$branchId]['version'],
-                            'date'    => date($this->dateFormat, $versions[$browserId][$branchId]['date']),
+                            'version' => $versions[$browserId][$branchId][$osId]['version'],
+                            'date'    => date($this->dateFormat, $versions[$browserId][$branchId][$osId]['date']),
                         );
                     }
                 }
@@ -364,9 +368,8 @@ class BrowsersVersions
         $branches = $this->getBranches();
         $oses = $this->getOSes();
         
-        $result = $this->db->prepare('SELECT * FROM `check` WHERE __modified < :modified')
-                           ->bind(':modified', time()-$this->autoApproveTimeOut)
-                           ->execute();
+        $result = $this->db->prepare('SELECT * FROM `check` WHERE __modified < ?')
+                           ->execute(array(time()-$this->autoApproveTimeOut));
         $info = array();
         while ($new = $result->fetch()) {
             $browserId = $new['browserId'];
@@ -417,74 +420,156 @@ class BrowsersVersions
 
     public function updateVersions() 
     {
-        if ($this->isLock()) {
+        if ($this->_isLock()) {
             return false;
         }
-        
-        $updateBrowsers = array();
+
         $updated = array();
         
-        $this->setLock();
+        $this->_setLock();
         
         $updated += $this->autoApproveCheck();
         
         $versions = $this->getLatestVersions();
         $browsers = $this->getBrowsers();
+		$wikiLinks = $this->getWikiLinks();
         $branches = $this->getBranches();
         $oses = $this->getOSes();
         
-        $wikiLinks = $this->getWikiLinks();
-        foreach ($browsers as $browserId => $browser) {
-            $browserName = strtolower($browser['shortName']);
-            foreach ($wikiLinks[$browserName] as $branchName=>$link) {
-                $branchId = array_search($branchName, $branches);
-                if ($branchId!==false && !isset($versions[$browserId][$branchId])) {
-                    $versions[$browserId][$branchId] = array(
-                                        'version'    => 0,
-                                        'date'       => 0,
-                                        '__modified' => 0,
-                                        '__id'       => 0,
-                                    );
-                }
-            }
-        }
+		$newVersions = array();
+		
+		foreach ($browsers as $browser) {
+			$browserName = strtolower($browser['shortName']);
+			if (!empty($browser['import'])) {
+				$newVersions[$browserName] = include $this->_dir . '/'. $browser['import'];
+			} else if (!empty($wikiLinks[$browserName])) {
+				$newVersions[$browserName] = $this->getVersionFromWiki($browser);
+			} 
+		}
+		
+		print_r($newVersions);
+		print_r($versions);	
+			
+		foreach ($versions as $browserId => $browser) {
+			$browserName = strtolower($browsers[$browserId]['shortName']);
+			if (!empty($newVersions[$browserName])) {
+				foreach ($browser as $branchId => $branch) {
+					$branchName = $branches[$branchId];
+					if (!empty($newVersions[$browserName][$branchName])) {
+						foreach ($branch as $osId => $current) {
+							$osName = $oses[$osId][0];
+							if (!empty($newVersions[$browserName][$branchName][$osName])) {
+								$new = $newVersions[$browserName][$branchName][$osName];
+								if ((time()-$current['__modified']) >= $this->updateTimeOut 	// data updated long enough 
+									&& (!empty($new['date'])  && !empty($new['version'])		// not empty info
+										&& $new['date'] > $current['date'])					    // new browser release date > current
+								) {
+									$updated[] = $this->newVersion($new, $current, $browserId, $branchId, $osId);
+								}
+							}
+						}
+					}
+				}
+			}
+		} 
 
-        foreach ($versions as $browserId=>$branch) {
-            foreach ($branch as $branchId=>$values) {
-                if ((time()-$values['__modified']) >= $this->updateTimeOut) {
-                    $updateBrowsers[] = array('browserId'=>$browserId, 'branchId'=>$branchId);
-                }
-            }
-        }
-        
-        foreach ($updateBrowsers as $browser) {
-            $new = $this->getVersionFromWikiText($browser['browserId'], $browser['branchId']);
-            if ($new!==false) {
-                $current = $versions[$browser['browserId']][$browser['branchId']];
-                if (isset($new['date'])  && isset($new['version'])
-                    && trim($new['version']) != ''
-                    && $new['date'] > $current['date']
-                    ) {
-                    $info = $this->newVersion($new, $current, $browser['browserId'], $browser['branchId']);
-                    if ($info!==false) {
-                        $updated[] = $info;
-                    }
-                }
-            }
-        }
-        
-        // forced versions update
-        $this->getLatestVersions(true);
-        
-        $this->removeLock();
+        $this->_removeLock();
+		
+		$this->getLatestVersions(true);
         
         return $updated;
+		
+    }
+	
+
+	public function getVersionFromWiki($browser) 
+	{
+		$newVersions = false;
+		$links = $this->getWikiLinks();
+		$browserName = strtolower($browser['shortName']);
+		if (empty($links[$browserName])) return false;
+		foreach ($links[$browserName]['releases'] as $osName => $osBranches) {
+			foreach ($osBranches as $branchName => $link) {
+				$filename = $this->_dir.'/'.$browserName.'_'.$branchName.'_'.$osName.'.txt';
+				if (file_exists($filename)) {
+					$text = file_get_contents($filename);
+				} else {
+					// $text = $this->_curlGet($link);
+					$text = false;
+				}
+				if (!empty($text)) {
+					if (empty($newVersions)) {
+						$newVersions = array();
+					}
+					$newVersions[$branchName][$osName] = $this->_parseWikiText($text, $links[$browserName]['regexp'], $branchName, $osName);
+				}
+			}
+		}
+		return $newVersions;
+	}
+	
+	
+	private function _parseWikiText($text, $regexps, $branchName, $osName) 
+	{
+		$versionRegexp = $this->_getRegexp($regexps, $branchName, $osName, 'version');
+		$dateRegexp = $this->_getRegexp($regexps, $branchName, $osName, 'date');
+
+		$info = array();
+		
+		preg_match_all($versionRegexp, $text, $data);
+		if (empty($data[1][0])) {
+			$info['version'] = false;
+		} else {
+			$info['version'] = trim($data[1][0]);
+		}
+		
+		preg_match_all($dateRegexp, $text, $data);
+		if (empty($data[1][0])) {
+			$info['date'] = false;
+		} else {
+			$info['date'] = strtotime(str_replace(array('|', '-'), '/', trim($data[1][0])));
+		}
+		
+		return $info;
+	}
+	
+	private function _getRegexp($regexps, $branchName, $osName, $type)
+	{
+		if (isset($regexps[$type.'_'.$branchName.'_'.$osName])) {
+			$regexp = $regexps[$type.'_'.$branchName.'_'.$osName];
+		} else if (isset($regexps[$type.'_'.$branchName])) {
+			$regexp = $regexps[$type.'_'.$branchName];
+		} else if (isset($regexps[$type.'__'.$osName])) {
+			$regexp = $regexps[$type.'__'.$osName];
+		} else {
+			$regexp = $regexps[$type];
+		}
+		return $regexp;
+	}
+	
+	
+	private function _curlGet($link) 
+	{
+		$ch = curl_init();
+		$options = array(
+			CURLOPT_URL            => $link,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_MAXREDIRS      => 10,
+			CURLOPT_HEADER         => false, 
+			CURLOPT_TIMEOUT        => 4, 
+			CURLOPT_USERAGENT      => $this->userAgent
+		);
+		curl_setopt_array($ch, $options);
+		$text = curl_exec($ch);
+		curl_close($ch);
+        return $text;
     }
     
     
-    private function isLock() {
-        if (file_exists($this->dir.'/lock')) {
-            $lock = (int) file_get_contents($this->dir.'/lock');
+    private function _isLock() {
+        if (file_exists($this->_dir.'/lock')) {
+            $lock = (int) file_get_contents($this->_dir.'/lock');
             if ((time()-$lock) <= $this->lockTimeOut) { 
                 return true;
             }
@@ -492,12 +577,12 @@ class BrowsersVersions
         return false;
     }    
     
-    private function setLock() {
-        file_put_contents($this->dir.'/lock', time());
+    private function _setLock() {
+        file_put_contents($this->_dir.'/lock', time());
     }    
     
-    private function removeLock() {
-        unlink($this->dir.'/lock');
+    private function _removeLock() {
+        unlink($this->_dir.'/lock');
     }
     
     
@@ -548,6 +633,8 @@ class BrowsersVersions
         
     }
     
+	
+	
     
     public function getWikiText($browserName, $branchName) {
         if ($this->curl) {
@@ -566,7 +653,7 @@ class BrowsersVersions
             $text = curl_exec($ch);
             curl_close($ch);
         } else {
-            $filename = $this->dir.'/'.$browserName.'_'.$branchName.'.txt';
+            $filename = $this->_dir.'/'.$browserName.'_'.$branchName.'.txt';
             if (file_exists($filename)) {
                 $text = file_get_contents($filename);
             } else {
@@ -585,14 +672,14 @@ class BrowsersVersions
             foreach ($branch as $branchName => $link) {
                 if (in_array($branchName, $branches)) {
                     if ($this->createShTool=='curl') {
-                        $out .= 'curl "'.$link.'" > '.$this->dir.'/'.$browserName.'_'.$branchName.'.txt' . PHP_EOL;
+                        $out .= 'curl "'.$link.'" > '.$this->_dir.'/'.$browserName.'_'.$branchName.'.txt' . PHP_EOL;
                     } else {
-                        $out .= 'wget "'.$link.'" -O '.$this->dir.'/'.$browserName.'_'.$branchName.'.txt '. PHP_EOL;
+                        $out .= 'wget "'.$link.'" -O '.$this->_dir.'/'.$browserName.'_'.$branchName.'.txt '. PHP_EOL;
                     }
                 }
             }
         }
-        return file_put_contents($this->dir.'/curl_links_files.sh', $out);        
+        return file_put_contents($this->_dir.'/curl_links_files.sh', $out);        
     }
     
      

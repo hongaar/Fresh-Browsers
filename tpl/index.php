@@ -6,8 +6,9 @@ $this->lib->browsersVersions->dateFormat = $this->lib->t('Y-m-d');
 $this->lib->browsersVersions->timeFormat = $this->lib->t('H:i:s');
 	
 $export = $this->lib->browsersVersions->getExport();
+$oses = $this->lib->browsersVersions->getOSes();
 
-echo $this->template('browsers.tpl.php', array('browsers'=>$export));
+echo $this->template('browsers.tpl.php', array('browsers'=>$export, 'oses'=>$oses));
 ?>
 
 <div class="span2 export">

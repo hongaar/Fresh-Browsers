@@ -1,0 +1,25 @@
+{{LPR
+|article= Google Chrome 
+|latest_release_version ='''Beta'''<br>23.0.1271.40
+|latest_release_date =  {{release date and age|2012|10|17}}
+}}<ref name= Releases>{{cite web| url=http://googlechromereleases.blogspot.com/2012/10/beta-channel-update_17.html| title=Chrome Releases| publisher= Google Blogspot| accessdate= 2012-10-17}}</ref><br>
+{{LPR
+|article= Google Chrome 
+|latest_release_version = '''Dev'''<br>27.0.1313.0
+|latest_release_date =  {{release date and age|2012|11|30}}
+}}<ref name= Releases/>
+<noinclude>
+➔ Back to article "'''[[Google Chrome]]'''"
+
+{{Template reference list}}
+
+[[Category:Latest preview software release templates|Google Chrome]]
+
+[[ko:틀:소프트웨어의 최신 버전 (미리보기판)/구글 크롬]]
+[[hu:Sablon:Legfrissebb fejlesztői kiadás/Google Chrome]]
+[[ja:Template:Latest preview software release/Google Chrome]]
+[[pl:Szablon:Ostatnie testowe wydanie/Google Chrome]]
+[[th:แม่แบบ:Latest preview software release/กูเกิล โครม]]
+[[zh-yue:Template:Latest preview software release/Google Chrome]]
+[[zh:Template:Latest preview software release/Google Chrome]]
+</noinclude>

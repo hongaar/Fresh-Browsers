@@ -24,7 +24,8 @@ return array(
                             'shortName'	=> 'Chrome',
                             'link'		=> 'http://www.google.com/chrome',
                             'branches'  => array(1 => 'stable', 2 => 'beta', 3 => 'dev', 4 => 'canary'),
-                            'os'        => array('windows', 'linux', 'android', 'ios', 'osx')
+                            'os'        => array('windows', 'linux', 'android', 'ios', 'osx'),
+//							'import'	=> 'importChrome.php',
                         ),
 
                         2	=> array(
