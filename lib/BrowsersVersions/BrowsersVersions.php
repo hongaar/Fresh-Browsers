@@ -34,7 +34,7 @@ class BrowsersVersions
     public $userAgent = 'Mozilla/4.0 (compatible; fresh-browsers.com bot)';
     public $db = null;
     
-    public $doNotApprove = true;            // set this to true if you do not want to approve new versions by email
+    public $doNotApprove = false;            // set this to true if you do not want to approve new versions by email
     public $approveLink = null;
     public $approveEmailFrom = '';
     public $approveEmailTo = '';
@@ -53,6 +53,8 @@ class BrowsersVersions
 	private $_dir = null;
 	
     private $_config = null;
+    
+    private $_OSByName = null;
 
     
     public function __construct(PDOWrapper $db)
@@ -66,6 +68,18 @@ class BrowsersVersions
     public function getOSes() 
     {
         return $this->_config['os'];
+    }
+    
+
+    public function getOSId($OSName) 
+    {
+        if (!isset($this->_OSByName)) {
+            $OSes = $this->getOSes();
+            foreach ($OSes as $OSId => $os) {
+                $this->_OSByName[$os[0]] = $OSId;
+            }
+        }
+        return $this->_OSByName[$OSName];
     }
     
     
@@ -180,15 +194,15 @@ class BrowsersVersions
                 'version'   => $new['version'],
                 'date'      => $new['date']
             ));
-            return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+            return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
-        if ($this->isBanned($new)) {
-            return 'BANNED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+        if ($this->isBanned($new, $browserId, $branchId, $osId)) {
+            return 'BANNED: '.$browsers[$browserId]['shortName'].' '.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
-        if ($this->isCheck($new)) {
-            return 'CHECKING: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+        if ($this->isCheck($new, $browserId, $branchId, $osId)) {
+            return 'CHECKING: '.$browsers[$browserId]['shortName'].' '.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
         $code = md5(uniqid(rand()));
@@ -216,7 +230,7 @@ class BrowsersVersions
             return false;
         }
         
-        return 'NEW: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+        return 'NEW: '.$browsers[$browserId]['shortName'].' '.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
     }
     
     
@@ -231,7 +245,7 @@ class BrowsersVersions
         $browserId = $new['browserId'];
         $branchId = $new['branchId'];
         $osId = $new['osId'];
-        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['version'].' ('.$branches[$branchId].' '.$oses[$osId].')';
+        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['version'].' ('.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId].')';
         $message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
                     . 'New: '.$new['version'] . ' ('.date('Y-m-d', $new['date']).')' . "\n"
                     .(!empty($current) ? 'Old: '.$current['version'].' ('.date('Y-m-d', $current['date']).')' . "\n" : '')
@@ -317,12 +331,12 @@ class BrowsersVersions
                                   ->execute();
     }
     
-    public function isBanned($version) 
+    public function isBanned($version, $browserId, $branchId, $osId) 
     {
         $count = $this->db->prepare('SELECT * FROM `ban` WHERE browserId=:browserId AND branchId=:branchId AND osId=:osId AND version=:version AND `date`=:date AND __modified > :modified')
-                            ->bind(':browserId', $version['browserId'])
-                            ->bind(':branchId', $version['branchId'])
-                            ->bind(':osId', $version['osId'])
+                            ->bind(':browserId', $browserId)
+                            ->bind(':branchId', $branchId)
+                            ->bind(':osId', $osId)
                             ->bind(':version', $version['version'])
                             ->bind(':date', $version['date'])
                             ->bind(':modified', time()-$this->banTimeOut)
@@ -332,12 +346,12 @@ class BrowsersVersions
     }
     
     
-    public function isCheck($version) 
+    public function isCheck($version, $browserId, $branchId, $osId) 
     {
         $count = $this->db->prepare('SELECT * FROM `check` WHERE browserId=:browserId AND branchId=:branchId AND osId=:osId AND version=:version AND `date`=:date AND __modified > :modified')
-                            ->bind(':browserId', $version['browserId'])
-                            ->bind(':branchId', $version['branchId'])
-                            ->bind(':osId', $version['osId'])
+                            ->bind(':browserId', $browserId)
+                            ->bind(':branchId', $branchId)
+                            ->bind(':osId', $osId)
                             ->bind(':version', $version['version'])
                             ->bind(':date', $version['date'])
                             ->bind(':modified', time()-$this->checkTimeOut)
@@ -417,6 +431,7 @@ class BrowsersVersions
                     ->fetch();
     }
 
+    
 
     public function updateVersions() 
     {
@@ -437,7 +452,7 @@ class BrowsersVersions
         $oses = $this->getOSes();
         
 		$newVersions = array();
-		
+        
 		foreach ($browsers as $browser) {
 			$browserName = strtolower($browser['shortName']);
 			if (!empty($browser['import'])) {
@@ -447,31 +462,37 @@ class BrowsersVersions
 			} 
 		}
 		
-		print_r($newVersions);
-		print_r($versions);	
-			
-		foreach ($versions as $browserId => $browser) {
-			$browserName = strtolower($browsers[$browserId]['shortName']);
-			if (!empty($newVersions[$browserName])) {
-				foreach ($browser as $branchId => $branch) {
-					$branchName = $branches[$branchId];
-					if (!empty($newVersions[$browserName][$branchName])) {
-						foreach ($branch as $osId => $current) {
-							$osName = $oses[$osId][0];
-							if (!empty($newVersions[$browserName][$branchName][$osName])) {
+		// print_r($newVersions);
+//		print_r($versions);	
+        
+        foreach ($browsers as $browserId => $browser) {
+            $browserName = strtolower($browsers[$browserId]['shortName']);
+            if (!empty($newVersions[$browserName])) {
+                foreach ($browser['branches'] as $branchId => $branchName) {
+//                    $branchName = $branches[$branchId];
+                    // echo $branchName.'<br>';
+                    if (!empty($newVersions[$browserName][$branchName])) {
+                        foreach ($browser['os'] as $osName) {
+                            if (!empty($newVersions[$browserName][$branchName][$osName])) {
+                                $osId = $this->getOSId($osName);
+                                $current = isset($versions[$browserId][$branchId][$osId]) ? $versions[$browserId][$branchId][$osId] : false;
+                                
 								$new = $newVersions[$browserName][$branchName][$osName];
-								if ((time()-$current['__modified']) >= $this->updateTimeOut 	// data updated long enough 
-									&& (!empty($new['date'])  && !empty($new['version'])		// not empty info
+								if ($current === false || 
+                                    ((time()-$current['__modified']) >= $this->updateTimeOut 	// data updated long enough 
+                                        && (!empty($new['date'] ) && !empty($new['version'])    // not empty info
 										&& $new['date'] > $current['date'])					    // new browser release date > current
+                                    )
 								) {
 									$updated[] = $this->newVersion($new, $current, $browserId, $branchId, $osId);
 								}
-							}
-						}
-					}
-				}
-			}
-		} 
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         $this->_removeLock();
 		

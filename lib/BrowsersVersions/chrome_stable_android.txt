@@ -1,0 +1,12 @@
+{{LSR
+|article = Google Chrome for Android
+|latest_release_version = '''Android'''<br/>18.0.1025464 (ARM)<br>18.0.1026320 (x86)<!-- DO NOT LIST DEV RELEASES -->
+|latest_release_date = {{start date and age|2012|11|01}}
+}}<ref>{{cite web |url=https://play.google.com/store/apps/details?id=com.android.chrome |title=Chrome |work=[[Google Play]] |publisher=[[Google]] |date=September 26, 2012 |accessdate=September 27, 2012}}</ref><ref><!-- PLAY STORE DOESN'T SAY THE VERSION NUMBER -->{{cite web |url=http://googlechromereleases.blogspot.hu/2012/11/chrome-for-android-update.html |title=Chrome for Android Update |first=Vinod |last=Ramachandran |work=Google Chrome Releases |type=Blog |publisher=[[Google]] |date=November 1, 2012 |accessdate=November 1, 2012}}</ref>
+<noinclude>
+Back to article:<br />
+? [[Google Chrome]]<br />
+? [[Google Chrome for Android]]
+{{Template reference list}}
+[[Category:Latest stable software release templates|Google Chrome for Android]]
+</noinclude>

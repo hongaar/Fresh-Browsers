@@ -15,7 +15,8 @@ return array(
 			'version'	=>	'/\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}version = (\d+\.\d+.\d+.\d*)/i',
 			'date'		=>	'/\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}date = \{\{.*[|\/]((\d{4})[|\/](\d{1,2})[|\/](\d{1,2}))\}\}/i',
 			'version_preview'	=>	'/\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}version =[\'\<\>a-z\ ]*Dev[\'\<\>a-z\ ]*(\d+\.\d+.\d+.\d*)/i',
-			'date_preview'		=>	'/Dev.*\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}date *= *\{\{.*[|\/]((\d{4})[|\/](\d{1,2})[|\/](\d{1,2}))\}\}/is'
+			'date_preview'		=>	'/Dev.*\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}date *= *\{\{.*[|\/]((\d{4})[|\/](\d{1,2})[|\/](\d{1,2}))\}\}/is',
+			'version_stable_android'	=>	'/\|[ ]{0,1}latest[ _]{0,1}release[ _]{0,1}version =.*Android[\'\<\>\/a-z\ ]*(\d+\.\d+\.\d+[\.0-9]*) \(ARM\)/i',
 		)
 	),
 /*

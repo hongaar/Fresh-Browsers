@@ -1,10 +1,15 @@
 <pre>
 <?php
 
+
+$this->mainTemplate = 'empty.tpl.php';
+
 $browsers = $this->lib->browsersVersions->getBrowsers();
 
-$this->lib->browsersVersions->updateVersions();
-	
+$updated = $this->lib->browsersVersions->updateVersions();
+
+echo '<hr>';
+print_r($updated);
 
 ?>
 </pre>

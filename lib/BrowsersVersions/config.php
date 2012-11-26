@@ -13,8 +13,8 @@ return array(
 	'branches' => array(
                         1	=>	'stable',
                         2	=>	'beta',
-                        3	=>	'preview',
-                        4	=>	'dev',
+                        3	=>	'dev',
+                        4	=>	'preview',
                         99	=>	'lts', // long term support
                     ),
 						
@@ -25,7 +25,7 @@ return array(
                             'link'		=> 'http://www.google.com/chrome',
                             'branches'  => array(1 => 'stable', 2 => 'beta', 3 => 'dev', 4 => 'canary'),
                             'os'        => array('windows', 'linux', 'android', 'ios', 'osx'),
-//							'import'	=> 'importChrome.php',
+							'import'	=> 'importChrome.php',
                         ),
 
                         2	=> array(
@@ -33,7 +33,8 @@ return array(
                             'shortName'	=> 'Firefox',
                             'link'		=> 'http://www.mozilla.com/firefox',
                             'branches'  => array(1 => 'release', 2 => 'beta', 3 => 'aurora', 4 => 'nightly'),
-                            'os'        => array('windows', 'linux', 'android', 'osx')
+                            'os'        => array('windows', 'linux', 'android', 'osx'),
+                            'import'	=> 'importFirefox.php',
                         ),
 
                         3	=> array(
