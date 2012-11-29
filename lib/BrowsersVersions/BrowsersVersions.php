@@ -480,6 +480,7 @@ class BrowsersVersions
 								$new = $newVersions[$browserName][$branchName][$osName];
 								if ($current === false || 
                                     ((time()-$current['__modified']) >= $this->updateTimeOut 	// data updated long enough 
+                                        && $new['version'] != $current['version']               // different version
                                         && (!empty($new['date'] ) && !empty($new['version'])    // not empty info
 										&& $new['date'] > $current['date'])					    // new browser release date > current
                                     )
