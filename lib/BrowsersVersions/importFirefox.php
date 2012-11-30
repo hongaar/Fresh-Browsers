@@ -51,7 +51,8 @@ function getVersionsFirefoxFromConfig($path) {
 
 }
 
-function getVersionsFirefox($path) {
+function getVersionsFirefox($path) 
+{
     
     $osReplace = array(
         'win' => 'windows',
@@ -69,7 +70,7 @@ function getVersionsFirefox($path) {
     
     $android = array(
         'release' => 'import/firefox/android-release.html',
-        'aurora'  => 'import/firefox/android-aurora.html',
+        'beta'  => 'import/firefox/android-beta.html',
     );
     
     $regexp = '/href=\".*download.*firefox-([0-9]+\.[0-9\.a-z]+)&.*os=([a-z0-9]+)&.*lang=en/iU';
@@ -85,32 +86,34 @@ function getVersionsFirefox($path) {
                 $osName = isset($osReplace[$osName]) ? $osReplace[$osName] : $osName;
                 $versions[$branch][$osName] = array(
                     'version' => $ver,
-                    'date' => time(),
+                    'date' => mktime(12, 0, 0),
                 );
             }
 
         }
     }
     
+    $osName = 'android';
     foreach ($android as $branch => $fileName) {
         if (file_exists($path.'/'.$fileName)) {
             $html = file_get_contents($path.'/'.$fileName);
             preg_match_all($regexpAndroid, $html, $data);
-            $osName = 'android';
-            if (!isset($data[1][0])) return false;
-            $time = strtotime($data[1][2]);
-            if ($time===false) return false;
-            $versions[$branch][$osName] = array(
-                'version' => $data[1][0],
-                'date' => $time,
-            );
+            if (isset($data[1][0])) {
+                $time = strtotime($data[2][0]);
+                if ($time!==false) {
+                    $versions[$branch][$osName] = array(
+                        'version' => $data[1][0],
+                        'date' => $time,
+                    );
+                }
+            }
         }
     }
+    
+    return $versions;
+    
 }
 
-
-
-function get
 
 $v = getVersionsFirefox($this->_dir);
 

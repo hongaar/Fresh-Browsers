@@ -50,7 +50,8 @@ return array(
                             'shortName'	=> 'Opera',
                             'link'		=> 'http://www.opera.com/browser/',
                             'branches'  => array(1 => 'stable', 2 => 'beta'),
-                            'os'        => array('windows', 'linux', 'osx')
+                            'os'        => array('windows', 'linux', 'osx'),
+                            'import'	=> 'importOpera.php',
                         ),
 
                         5	=> array(

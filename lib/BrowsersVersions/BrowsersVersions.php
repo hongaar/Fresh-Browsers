@@ -245,7 +245,7 @@ class BrowsersVersions
         $browserId = $new['browserId'];
         $branchId = $new['branchId'];
         $osId = $new['osId'];
-        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['version'].' ('.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId].')';
+        $subject = 'Fresh Browsers - '.$browsers[$browserId]['shortName'].' '.$new['version'].' ('.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].')';
         $message = $browsers[$browserId]['name'].' '.$branches[$branchId] . "\n"
                     . 'New: '.$new['version'] . ' ('.date('Y-m-d', $new['date']).')' . "\n"
                     .(!empty($current) ? 'Old: '.$current['version'].' ('.date('Y-m-d', $current['date']).')' . "\n" : '')
@@ -395,16 +395,15 @@ class BrowsersVersions
                                 ->bind(':osId', $osId)
                                 ->execute()
                                 ->fetch();
-
             if ($current!==false && $this->isNew($current, $new)) {
                 if ($this->addVersion($new)) {
                     // $this->deleteFromCheck($new['id']);
-                    $info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+                    $info[] = 'AUTOUPDATED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
                 }
             } else {
-                $info[] = 'AUTOUPDATE FAILED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
+                $info[] = 'AUTOUPDATE FAILED: '.$browsers[$browserId]['shortName'].' '.$branches[$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
                 $this->approveMail($current, $new, $new['code']);
-                $result = $this->db->prepare('UPDATE `check` SET __modified=?')->execute(time());
+                $result = $this->db->prepare('UPDATE `check` SET __modified=?')->execute(array(time()));
             }
         }
         return $info;

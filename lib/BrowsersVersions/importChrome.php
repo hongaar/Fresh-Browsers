@@ -1,6 +1,7 @@
 <?php
 
-function getVersions($source) {
+function getVersionsChrome($source) 
+{
     $osReplace = array(
         'win' => 'windows',
         'w32' => 'windows',
@@ -21,7 +22,7 @@ function getVersions($source) {
     return $versions;
 }
 
-$v = getVersions($this->_dir.'/chrome_all.json'); // 'http://omahaproxy.appspot.com/all.json'
+$v = getVersionsChrome($this->_dir.'/chrome_all.json'); // 'http://omahaproxy.appspot.com/all.json'
 
 $links = $this->getWikiLinks();
 $v['stable']['android'] = $this->_parseWikiText(file_get_contents($this->_dir.'/chrome_stable_android.txt'), $links['chrome']['regexp'], 'stable', 'android');
