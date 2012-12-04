@@ -57,6 +57,7 @@ function getVersionsFirefox($path)
     $osReplace = array(
         'win' => 'windows',
         'w32' => 'windows',
+        'win32' => 'windows',
         'lin' => 'linux',
         'mac' => 'osx',
         'cros' => 'android',
@@ -73,14 +74,22 @@ function getVersionsFirefox($path)
         'beta'  => 'import/firefox/android-beta.html',
     );
     
-    $regexp = '/href=\".*download.*firefox-([0-9]+\.[0-9\.a-z]+)&.*os=([a-z0-9]+)&.*lang=en/iU';
+    $regexp = array(
+        'release' => '/href=\".*firefox-([0-9]+\.[0-9\.a-z]+)&.*os=([a-z0-9]+)&.*lang=en/iU',
+        'beta'    => '/href=\".*firefox-([0-9]+\.[0-9\.a-z]+)&.*os=([a-z0-9]+)&.*lang=en/iU',
+        'aurora'  => '/href=\".*firefox-([0-9]+\.[0-9\.a-z]+)\..*.*en.*(win32|mac|linux)/iU',
+    );
+    
     $regexpAndroid = '/href=\"fennec-([0-9]+\.[0-9a-z]+)\..*\.apk\".*([0-9]{1,2}\-[0-9a-z]{1,3}\-[0-9]{2,4}) [0-9]{1,2}\:[0-9]{1,2}/iU';
     
     $versions = array();
     foreach ($files as $branch => $fileName) {
         if (file_exists($path.'/'.$fileName)) {
             $html = file_get_contents($path.'/'.$fileName);
-            preg_match_all($regexp, $html, $data);
+            preg_match_all($regexp[$branch], $html, $data);
+            // echo $branch.'<br>';
+            // print_r($data);
+            // echo '<hr>';
             foreach ($data[1] as $n => $ver) {
                 $osName = $data[2][$n];
                 $osName = isset($osReplace[$osName]) ? $osReplace[$osName] : $osName;

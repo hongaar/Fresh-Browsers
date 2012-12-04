@@ -1,4 +1,6 @@
 #!/bin/sh
-curl http://arc.opera.com/snapshot/windows/ >windows-preview.html
-curl http://arc.opera.com/snapshot/mac/ >mac-preview.html
-curl http://arc.opera.com/snapshot/linux-freebsd/ >linux-preview.html
+curl --head http://snapshot.opera.com/windows/latest >windows-preview.txt
+curl --head http://snapshot.opera.com/unix/latest >linux-preview.txt
+curl --head http://snapshot.opera.com/mac/latest >mac-preview.txt
+
+curl http://get.opera.com/pub/opera/info/files.txt > release.txt

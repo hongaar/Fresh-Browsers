@@ -1,0 +1,6 @@
+HTTP/1.1 307 Temporary Redirect
+Date: Tue, 04 Dec 2012 12:00:32 GMT
+Server: Apache/2.2.3 (Debian)
+Location: http://snapshot.opera.com/windows/1712_12.12-1662/Opera-Next-12.12-1662.i386.exe
+Content-Type: text/html; charset=iso-8859-1
+

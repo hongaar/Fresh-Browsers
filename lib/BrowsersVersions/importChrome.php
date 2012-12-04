@@ -6,7 +6,7 @@ function getVersionsChrome($source)
         'win' => 'windows',
         'w32' => 'windows',
         'mac' => 'osx',
-        'cros' => 'android',
+//        'cros' => 'android',
     );
     $info = json_decode(file_get_contents($source), true);
     $versions = array();
@@ -22,9 +22,10 @@ function getVersionsChrome($source)
     return $versions;
 }
 
-$v = getVersionsChrome($this->_dir.'/chrome_all.json'); // 'http://omahaproxy.appspot.com/all.json'
-
-$links = $this->getWikiLinks();
-$v['stable']['android'] = $this->_parseWikiText(file_get_contents($this->_dir.'/chrome_stable_android.txt'), $links['chrome']['regexp'], 'stable', 'android');
+if (empty($v['stable']['android'])) {
+    $v = getVersionsChrome($this->_dir.'/import/chrome/all.json'); // 'http://omahaproxy.appspot.com/all.json'
+    $links = $this->getWikiLinks();
+    $v['stable']['android'] = $this->_parseWikiText(file_get_contents($this->_dir.'/import/chrome/stable_android.txt'), $links['chrome']['regexp'], 'stable', 'android');
+}
 
 return $v;
