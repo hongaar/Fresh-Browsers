@@ -149,16 +149,17 @@ class BrowsersVersions
     
         $versions = $this->getLatestVersions();
         $browsers = $this->getBrowsers();
-        $branches = $this->getBranches();
-        $oses = $this->getOSes();
+        // $branches = $this->getBranches();
+        // $oses = $this->getOSes();
 
         $export = array();
 
         foreach ($browsers as $browserId => $browser) {              // all browsers
             $browserName = strtolower($browser['shortName']);
-            foreach ($branches as $branchId => $branchName) {        // all branches
+            foreach ($browsers[$browserId]['branches'] as $branchId => $branchName) {        // all branches
                 $branchName = ucfirst($branchName);
-                foreach ($oses as $osId => $osArr) {                 // all oses
+                foreach ($browsers[$browserId]['os'] as $osName) {                 // all oses
+                    $osId = $this->getOSId($osName);
                     if (isset($versions[$browserId][$branchId][$osId])) {   // check if we have version for this browser-branch
                         if (!isset($export[$browserName])) {                // create export array if this browser is not in it yet 
                             $export[$browserName] = array(    
@@ -166,7 +167,7 @@ class BrowsersVersions
                                 'link'       => $browser['link'],
                             );
                         }
-                        $export[$browserName][$branchName][$osArr[0]] = array(
+                        $export[$browserName][$branchName][$osName] = array(
                             'version' => $versions[$browserId][$branchId][$osId]['version'],
                             'date'    => date($this->dateFormat, $versions[$browserId][$branchId][$osId]['date']),
                         );
@@ -272,7 +273,7 @@ class BrowsersVersions
                             ->bind(':date', $version['date'])
                             ->execute();
         } else {
-            return $this->db->prepare('DELETE FROM `check` WHERE id=?')->execute($version);
+            return $this->db->prepare('DELETE FROM `check` WHERE id=?')->execute(array($version));
         }
     }
     
@@ -426,7 +427,7 @@ class BrowsersVersions
     public function getCheckByCode($code) 
     {
         return $this->db->prepare('SELECT * FROM `check` WHERE code=?')
-                    ->execute($code)
+                    ->execute(array($code))
                     ->fetch();
     }
 
@@ -550,7 +551,6 @@ class BrowsersVersions
 		} else {
 			$info['date'] = strtotime(str_replace(array('|', '-'), '/', trim($data[1][0])));
 		}
-		
 		return $info;
 	}
 	

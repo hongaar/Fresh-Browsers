@@ -8,6 +8,7 @@ return array(
                         3 => array('ios',     'iOS'),
                         4 => array('android', 'Android'),
                         5 => array('osx',     'MacOS X'),
+                        6 => array('winphone','Windows Phone'),
                     ),
     
 	'branches' => array(
@@ -41,8 +42,8 @@ return array(
                             'name'		=> 'Internet Explorer',
                             'shortName'	=> 'IE',
                             'link'		=> 'http://www.microsoft.com/ie',
-                            'branches'  => array(1 => 'stable', 3 => 'preview'),
-                            'os'        => array('windows')
+                            'branches'  => array(1 => 'stable'), // , 3 => 'preview'
+                            'os'        => array('windows', 'winphone')
                         ),
 
                         4	=> array(
@@ -58,8 +59,8 @@ return array(
                             'name'		=> 'Apple Safari',
                             'shortName'	=> 'Safari',
                             'link'		=> 'http://www.apple.com/safari/',
-                            'branches'  => array(1 => 'stable', 2 => 'beta'),
-                            'os'        => array('windows', 'ios', 'osx')
+                            'branches'  => array(1 => 'stable'), // , 2 => 'beta'
+                            'os'        => array('ios', 'osx')
                         ),
 	)
 );

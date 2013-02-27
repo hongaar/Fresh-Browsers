@@ -1,0 +1,13 @@
+{{LSR
+|article = Internet Explorer
+|latest_release_version = 10.0.2 <ref>{{cite web|url=http://support.microsoft.com/kb/2718695 |title=Internet Explorer 10.99 is now available |work=Microsoft Support |publisher=Microsoft |date=21 August 2012 |accessdate=31 August 2012}}</ref>
+|latest_release_date = {{release date and age|2013|02|12}}
+}}<noinclude>
+
+➔ Back to article "'''[[Internet Explorer]]'''"
+
+[[Category:Latest stable software release templates|Internet Explorer]]
+<references />
+[[ko:틀:소프트웨어의 최신 버전 (안정판)/인터넷 익스플로러]]
+[[pl:Szablon:Ostatnie stabilne wydanie/Internet Explorer]]
+</noinclude>
