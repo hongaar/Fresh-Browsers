@@ -1,1 +1,1 @@
-<?phpreturn array(	'Y-m-d'			=>		'd.m.Y',	'H:i:s'			=>		'H:i:s');
+<?phpreturn array(    'Y-m-d'	=>	'd.m.Y',    'H:i:s'	=>	'H:i:s',    'Stable_history'	=>	'Stable',    'Preview_history'	=>	'Preview',    'about_text'	=>	'Fresh Browsers ist ein open-source Projekt, dass die    neuesten Browser Versionen zusammentragt und deren Vorgangerversionenen in vielen gangigen Formaten bereitstellt.',    'get_sorce_text'	=>	'Hold dir das Skript, mach mit, sende deinen Code und Bugs.',);
