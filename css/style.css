@@ -1,7 +1,7 @@
 .hero-unit {
-	border-radius: 0 0 6px 6px;
-	margin-bottom: 15px;
-	padding: 30px 60px 30px 60px;
+	border-radius:0 0 6px 6px;
+	margin-bottom:15px;
+	padding:30px 60px 30px 60px;
 	position:relative;
 }
 .hero-unit h1 {
@@ -9,11 +9,13 @@
 	line-height: 28px;
 	font-weight:normal;
 	letter-spacing: 0;
+    margin:0;
 }
 .hero-unit h2 {
 	font-size:60px;
 	line-height: 1;
 	letter-spacing: -1px;
+    margin:0;
 }
 #language {
 	position:absolute;
@@ -48,13 +50,31 @@
 .browser a {
 	display:block;
 }
-.browsers h3,
-.browsers h4 {
-	margin-top:10px;
-}
+.browsers h4,
+.browsers h5, 
 .browsers h3 {
+    margin:0;
 	font-size: 14px;
 	line-height: 18px;
+}
+.browsers h3 {
+	margin-top:10px;
+}
+.browsers .info {
+    margin-bottom:10px;
+}
+.browsers h5 {
+	font-weight:normal;
+    color:#468847;
+}
+.browsers .release {
+    border-top:1px solid #ccc;
+    margin-top:10px;
+    padding-top:10px;
+}
+.browsers .release-first {
+    border-top:0;
+    padding-top:0;
 }
 .browsers .version {
 	font-weight:bold;
@@ -140,6 +160,18 @@
 	color:#999;
 	width:85px;
 }
+
+.history .nav-pills > .osactive > a,
+.history  .nav-pills > .osactive > a:hover, 
+.history  .nav-pills > .osactive > a:focus {
+    background-color: #468847;
+    color:#fff;
+}
+
+.nav-pills > li.os > a {
+    color: #468847;
+}
+
 .row-year:hover .browsers-year {
 	color:#000;
 }

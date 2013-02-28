@@ -14,8 +14,8 @@ return array(
 	'branches' => array(
                         1	=>	'stable',
                         2	=>	'beta',
-                        3	=>	'dev',
-                        4	=>	'preview',
+                        3	=>	'preview',
+                        4	=>	'dev',
                         99	=>	'lts', // long term support
                     ),
 						

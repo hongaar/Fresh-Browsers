@@ -18,5 +18,3 @@ To do
 * Facebook + vk.com pages
 * Authorization (add/edit/delete): user edit page, forms class
 * /update /createsh /twitter and so on should be CLI
-* Add MacOS, iOS, Linux, Android & others.
-* More and flexible branches

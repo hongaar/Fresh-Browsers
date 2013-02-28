@@ -79,7 +79,7 @@ class BrowsersVersions
                 $this->_OSByName[$os[0]] = $OSId;
             }
         }
-        return $this->_OSByName[$OSName];
+        return isset($this->_OSByName[$OSName]) ? $this->_OSByName[$OSName] : false;
     }
     
     

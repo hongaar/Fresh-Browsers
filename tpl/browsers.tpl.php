@@ -10,26 +10,30 @@ foreach ($browsers as $shortName => $browser) {
 <div class="span2 browsers">
 	<div class="browser" id="browser-<?=$shortName?>"><a href="<?=$browser['link']?>"></a></div>
 	<h3><a href="<?=$browser['link']?>"><?=$browser['name']?></a></h3>
-<?php
+    <?php
+    $first = true;
 	foreach ($browser as $branchName => $branch) {
 		if (is_array($branch)) {
-?>
-	<h4><?=$this->lib->t($branchName)?></h4>
-	<div class="release">
-<?php
+        ?>
+        <div class="release<?=$first ? ' release-first' : ''?>">
+        <h4><?=$this->lib->t($branchName)?></h4>
+        <?php
+        $first = false;
 		foreach ($branch as $osName => $osBranch) {
-?>
-		<h5><?=$osArr[$osName]?></h5>
-		<span class="version"><?=$osBranch['version']?></span>
-		<span class="date"><?=$osBranch['date']?></span>
-<?php
+            ?>
+            <h5><?=$osArr[$osName]?></h5>
+            <div class="info">
+                <span class="version"><?=$osBranch['version']?></span>
+                <span class="date"><?=$osBranch['date']?></span>
+            </div>
+            <?php
 		}
-?>
-	</div>
-<?php
+        ?>
+        </div>
+        <?php
 		}
 	}
-?>
+    ?>
 </div>
 <?php
 }

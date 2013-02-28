@@ -10,13 +10,14 @@ $this->subtitle = $this->lib->t('The history of web browsers.');
 
 $branches = $this->lib->browsersVersions->getBranches();
 $browsers = $this->lib->browsersVersions->getBrowsers();
+$oses = $this->lib->browsersVersions->getOSes();
 
 if (isset($this->variables[0])) {
 	$id = (int) $this->variables[0];
 	$obj = $this->lib->db->prepare('SELECT * FROM history WHERE id=:id')
-						->bind(':id', $id)
-						->execute()
-						->fetch();
+        ->bind(':id', $id)
+        ->execute()
+        ->fetch();
 	if ($obj!==false) {
 		?>
 		<h1><?=$browsers[$obj['browserId']]['name'].' '.$obj['version'].' ('.ucfirst($branches[$obj['branchId']]).')'?></h1>
@@ -29,17 +30,32 @@ if (isset($this->variables[0])) {
 	}
 }
 
-if (isset($this->variables[0]) && $this->variables[0]=='preview') {
-	$branchId = 3;
-} else {
-	$branchId = 1;
+
+$branchId = 1;
+$osId = 1;
+$vars = array();
+if (isset($this->variables[0])) {
+    $vars[] = $this->variables[0];
+}
+if (isset($this->variables[1])) {
+    $vars[] = $this->variables[1];
+}
+
+foreach ($vars as $var) {
+    $temp = array_search($var, $branches);
+    if ($temp !== false) {
+        $branchId = $temp;
+    } else {
+        $temp = $this->lib->browsersVersions->getOSId($var);
+        if ($temp !== false) $osId = $temp;
+    }
 }
 
 $branch = $branches[$branchId];
 
 		
-$result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=? ORDER BY `date` DESC, __modified DESC LIMIT 1000')
-						->execute(array($branchId));
+$result = $this->lib->db->prepare('SELECT * FROM history WHERE branchId=? AND osId=? ORDER BY `date` DESC, __modified DESC LIMIT 1000')
+						->execute(array($branchId, $osId));
 $history = array();
 $yearMonths = array();
 while ($browser = $result->fetch()) {
@@ -57,10 +73,23 @@ while ($browser = $result->fetch()) {
 <div class="history">
 
 <ul class="nav nav-pills">
-    <li<?=$branchId==1?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action)?>"><?=$this->lib->t('Stable_history')?></a></li>
-    <li<?=$branchId==3?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/preview')?>"><?=$this->lib->t('Preview_history')?></a></li>
+<?php
+    foreach ($branches as $id => $name) {
+?>
+    <li<?=$branchId==$id?' class="active"':''?>><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/'.$name)?>"><?=$this->lib->t($name)?></a></li>
+<?php
+    }
+?>
 </ul>
-
+<ul class="nav nav-pills">
+<?php
+    foreach ($oses as $id => $name) {
+?>
+    <li class="os<?=$osId==$id?'active"':''?>"><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/'.$branch.'/'.$name[0])?>"><?=$this->lib->t($name[1])?></a></li>
+<?php
+    }
+?>
+</ul>
 
 <table>
 <tr>
@@ -142,7 +171,7 @@ foreach ($history as $year => $yearHistory) {
 					$out .= '&nbsp;<br>';
 				}
 			}
-			echo $n>1 ? (!empty($head)?$head.$out.'</div>':$out) : $out;
+			echo $n > 1 ? (!empty($head) ? $head . $out . '</div>' : $out) : $out;
 		} else {
 			echo '&nbsp;<br>';
 		}
