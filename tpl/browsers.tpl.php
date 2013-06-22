@@ -13,24 +13,28 @@ foreach ($browsers as $shortName => $browser) {
     <?php
     $first = true;
 	foreach ($browser as $branchName => $branch) {
-		if (is_array($branch)) {
-        ?>
-        <div class="release<?=$first ? ' release-first' : ''?>">
-        <h4><?=$this->lib->t($branchName)?></h4>
-        <?php
-        $first = false;
-		foreach ($branch as $osName => $osBranch) {
-            ?>
-            <h5><?=$osArr[$osName]?></h5>
-            <div class="info">
-                <span class="version"><?=$osBranch['version']?></span>
-                <span class="date"><?=$osBranch['date']?></span>
-            </div>
-            <?php
-		}
-        ?>
-        </div>
-        <?php
+		if ($branchName != 'Dev') {
+			if (is_array($branch)) {
+			?>
+			<div class="release<?=$first ? ' release-first' : ''?>">
+			<h4><?=$this->lib->t($branchName)?></h4>
+			<?php
+			$first = false;
+			foreach ($branch as $osName => $osBranch) {
+				if ($osName != 'linux') {
+				?>
+				<h5><?=$osArr[$osName]?></h5>
+				<div class="info">
+					<span class="version"><?=$osBranch['version']?></span>
+					<span class="date"><?=$osBranch['date']?></span>
+				</div>
+				<?php
+				}
+			}
+			?>
+			</div>
+			<?php
+			}
 		}
 	}
     ?>
