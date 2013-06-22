@@ -7,6 +7,7 @@ function getVersionsChrome($source)
         'w32' => 'windows',
         'mac' => 'osx',
         'android' => 'android',
+		'ios' => 'ios',
     );
     $info = json_decode(file_get_contents($source), true);
     $versions = array();
