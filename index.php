@@ -36,6 +36,7 @@ $core->libsDefaultMethods = array(
 $core->languages = array(	
     'en'=>'English', 
     'ru'=>'Русский', 
+	// 'de'=>'Deutsch', 
 );
 if (isset($core->languages[$core->action])) {
 	$language = $core->action;
