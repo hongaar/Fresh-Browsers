@@ -128,7 +128,8 @@ class Translate
      */
     private function _getLanguage()
     {
-        $langs = explode(';', str_replace(' ', '', strtolower($_SERVER['HTTP_ACCEPT_LANGUAGE'])));
+		$langsString = empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? '' : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+        $langs = explode(';', str_replace(' ', '', $langsString));
         $max = -1;
         foreach ($langs as $key => $lang) {
             if ($lang!='') {

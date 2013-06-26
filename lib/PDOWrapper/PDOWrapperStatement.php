@@ -21,7 +21,7 @@
 class PDOWrapperStatement
 {
 
-    private $_pdo = null;
+    protected $_pdo = null;
     private $_statement = null;
     public $error = false;
     
@@ -76,7 +76,6 @@ class PDOWrapperStatement
                 $type = PDO::PARAM_STR;
             }
         }
-
         $this->_statement->bindValue($pos, $value, $type);
         return $this;
     }

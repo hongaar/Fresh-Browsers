@@ -55,6 +55,8 @@ class PDOWrapper
 {
 
     public $handler;
+    public $stmt;
+    public $pager;
 
     /**
      * Constructor.
@@ -80,15 +82,43 @@ class PDOWrapper
         $stmt->prepare($query);
         return $stmt;
     }
+    
+    public function preparePager($query, $options) 
+    {
+        include_once dirname(__FILE__).'/PagerStatement.php';
+        $pager = new PagerStatement($this->handler, $options);
+        $pager->prepare($query);
+        return $pager;
+    }
 
     /**
      * Returns the ID of the last inserted row
      *
      * @return ID of the last row that was inserted into the db
      */
-    public function lastInsertID() 
+    public function lastInsertId() 
     {
         return $this->handler->lastInsertID();
+    }
+    
+    /**
+     * Places quotes around the input string (if required) and escapes 
+     * special characters within the input string, using a quoting style 
+     * appropriate to the underlying driver. 
+     *
+     * @param string $string the string to be quoted
+     * @param integer $type  data type hint for drivers
+     *
+     * @return quoted string that is theoretically safe to pass into an SQL statement
+     */
+    public function quote($string, $type = PDO::PARAM_STR) 
+    {
+        return $this->handler->quote($string, $type);
+    }
+    
+    public function escape($string, $type = PDO::PARAM_STR) 
+    {
+        return substr($this->handler->quote($string, $type), 1, -1);
     }
 
 }
