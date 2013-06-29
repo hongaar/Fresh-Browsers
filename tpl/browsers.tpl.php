@@ -1,5 +1,8 @@
 <?php
 
+if (empty($oses)) {
+    $oses = $this->lib->browsersVersions->getOSes();
+}
 $osArr = array();
 foreach ($oses as $osId => $os) {
     $osArr[$os[0]] = $os[1];

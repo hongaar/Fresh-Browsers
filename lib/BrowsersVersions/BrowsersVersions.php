@@ -187,14 +187,12 @@ class BrowsersVersions
         $branches = $this->getBranches();
         $oses = $this->getOSes();
         
+		$new['browserId'] = $browserId;
+		$new['branchId'] = $branchId;
+		$new['osId'] = $osId;
+		
         if ($this->doNotApprove) {
-            $this->addVersion(array(
-                'browserId' => $browserId,
-                'branchId'  => $branchId,
-                'osId'      => $osId,
-                'version'   => $new['version'],
-                'date'      => $new['date']
-            ));
+            $this->addVersion($new);
             return 'ADDED: '.$browsers[$browserId]['shortName'].' '.$browsers[$browserId]['branches'][$branchId].' '.$oses[$osId][1].' '.$new['version'].' ('.date('Y-m-d', $new['date']).')';
         }
         
