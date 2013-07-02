@@ -24,7 +24,7 @@ foreach ($browsers as $shortName => $browser) {
 			<?php
 			$first = false;
 			foreach ($branch as $osName => $osBranch) {
-				if ($osName != 'linux') {
+				if ($osName != 'linux' && $osName != 'winphone') {
 				?>
 				<h5><?=$osArr[$osName]?></h5>
 				<div class="info">

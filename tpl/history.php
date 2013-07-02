@@ -84,9 +84,11 @@ while ($browser = $result->fetch()) {
 <ul class="nav nav-pills">
 <?php
     foreach ($oses as $id => $name) {
+		if ($name[0] != 'winphone') {
 ?>
     <li class="os<?=$osId==$id?'active"':''?>"><a href="<?=$this->link('/'.$this->lib->t->language.'/'.$this->action.'/'.$branch.'/'.$name[0])?>"><?=$this->lib->t($name[1])?></a></li>
 <?php
+		}
     }
 ?>
 </ul>
