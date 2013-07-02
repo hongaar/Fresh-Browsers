@@ -8,7 +8,7 @@ return array(
                         3 => array('ios',     'iOS'),
                         4 => array('android', 'Android'),
                         5 => array('osx',     'MacOS X'),
-                        // 6 => array('winphone','Windows Phone'),
+                        6 => array('winphone','Windows Phone'),
                     ),
     
 	'branches' => array(

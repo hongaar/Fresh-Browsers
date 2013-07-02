@@ -460,7 +460,7 @@ class BrowsersVersions
 			} 
 		}
 		
-		// print_r($newVersions);
+//		print_r($newVersions);
 //		print_r($versions);	
         
         foreach ($browsers as $browserId => $browser) {

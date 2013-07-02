@@ -40,9 +40,10 @@ function getVersionsOpera($path)
     
     $releaseFile = 'import/opera/release.txt';
     $releaseRegexp = array(
-        'windows' => '/\[[ ]*[0-9]+ (.*)\][ ]*win\/([0-9]{2,6})\/en\/Opera[-_]{1}[0-9]+.*\.exe/iU',
-        'linux'   => '/\[[ ]*[0-9]+ (.*)\][ ]*linux\/([0-9]{2,6})\/Opera[-_]{1}[0-9]+.*\.deb/iU',
-        'mac'     => '/\[[ ]*[0-9]+ (.*)\][ ]*mac\/([0-9]{2,6})\/Opera[-_]{1}[0-9\.]+.*\.dmg/iU',
+        'windows' => '/desktop\/([0-9\.]+)\/win\/Opera[-_][0-9\.]+.*\Setup.exe/iU',
+		'mac' => '/desktop\/([0-9\.]+)\/mac\/Opera[-_][0-9\.]+.*\Setup.dmg/iU',
+//        'linux'   => '/\[[ ]*[0-9]+ (.*)\][ ]*linux\/([0-9]{2,6})\/Opera[-_]{1}[0-9]+.*\.deb/iU',
+//        'mac'     => '/\[[ ]*[0-9]+ (.*)\][ ]*mac\/([0-9]{2,6})\/Opera[-_]{1}[0-9\.]+.*\.dmg/iU',
 //        'beta'    => '/href=\".*firefox-([0-9]+\.[0-9\.a-z]+)&.*os=([a-z0-9]+)&.*lang=en/iU',
 //        'aurora'  => '/href=\".*firefox-([0-9]+\.[0-9\.a-z]+)\..*.*en.*(win32|mac|linux)/iU',
     );
@@ -70,21 +71,18 @@ function getVersionsOpera($path)
         $txt = file_get_contents($path.'/'.$releaseFile);
         foreach ($releaseRegexp as $osName => $regexp) {
             preg_match_all($regexp, $txt, $data);
-            if (!empty($data) && !empty($data[2])) {
-                foreach ($data[1] as &$dt) {
-                    $dt = strtotime($dt);
-                }
-                
+
+            if (!empty($data) && !empty($data[1])) {
+
                 arsort($data[1]);
                 reset($data[1]);
                 $key = key($data[1]);
-                
+				
                 $osName = isset($osReplace[$osName]) ? $osReplace[$osName] : $osName;
-                if (!empty($data[2][$key])) {
-                    $ver = substr($data[2][$key], 0, 2) . '.' . substr($data[2][$key], 2);
-                    $versions['release'][$osName] = array(
-                        'version' => $ver,
-                        'date' => $data[1][$key],
+                if (!empty($data[1][$key])) {
+                    $versions['stable'][$osName] = array(
+                        'version' => $data[1][$key],
+                        'date' => time(),
                     );
                 }
             }
@@ -97,7 +95,5 @@ function getVersionsOpera($path)
 
 
 $v = getVersionsOpera($this->_dir);
-
-// print_r($v);
 
 return $v;
